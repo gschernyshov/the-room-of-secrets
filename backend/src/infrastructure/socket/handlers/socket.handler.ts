@@ -26,9 +26,9 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
 
         await socket.join(room.id)
 
-        callback?.({ success: true, data: room })
+        return callback?.({ success: true, data: room })
       } catch (error) {
-        callback?.({ success: false, error: { message: error.message } })
+        return callback?.({ success: false, error: { message: error.message } })
       }
     }
   )
@@ -58,9 +58,9 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
           timestamp: new Date().toISOString(),
         })
 
-        callback?.({ success: true, data: { room, messages } })
+        return callback?.({ success: true, data: { room, messages } })
       } catch (error) {
-        callback?.({
+        return callback?.({
           success: false,
           error: { message: error.message },
         })
@@ -99,9 +99,9 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
 
         socket.to(roomId).emit('new_message', message)
 
-        callback?.({ success: true })
+        return callback?.({ success: true })
       } catch (error) {
-        callback?.({
+        return callback?.({
           success: false,
           error: { message: error.message },
         })
@@ -126,9 +126,9 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
           timestamp: new Date().toISOString(),
         })
 
-        callback?.({ success: true })
+        return callback?.({ success: true })
       } catch (error) {
-        callback?.({
+        return callback?.({
           success: false,
           error: { message: error.message },
         })
