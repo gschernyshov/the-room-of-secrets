@@ -7,11 +7,3 @@ export type Room = {
   participants: User['id'][]
   createdAt: Date
 }
-
-export type Message = {
-  id: UUID
-  roomId: Room['id']
-  senderId: User['id']
-  content: string
-  timestamp: Date
-}

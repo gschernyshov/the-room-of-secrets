@@ -1,4 +1,4 @@
-import { Message } from '../../../domains/room/types/room.type.js'
+import { type Message } from '../../../domains/message/types/message.type.js'
 
 export const isValidMessageContent = (
   content: unknown

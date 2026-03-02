@@ -1,46 +1,70 @@
-import { randomUUID } from 'crypto'
 import { ROOM_CREATED, ROOM_JOINED } from '../events/index.js'
 import { roomRepository } from '../repositories/room.repository.js'
-import { Message, Room } from '../types/room.type.js'
-import { User } from '../../user/types/user.type.js'
+import { type Room } from '../types/room.type.js'
+import { type User } from '../../user/types/user.type.js'
+import { messageRepository } from '../../message/repositories/message.repository.js'
+import { type Message } from '../../message/types/message.type.js'
 import { eventBus } from '../../../infrastructure/events/eventBus.js'
+import { logger } from '../../../shared/utils/logger.js'
 import { AppError } from '../../../shared/utils/errors.js'
 
 export const roomService = {
-  create: (creatorId: User['id'], name: Room['name']) => {
-    const room: Room = {
-      id: randomUUID(),
-      name,
-      participants: [creatorId],
-      createdAt: new Date(),
+  create: async (name: Room['name'], creatorId: User['id']): Promise<Room> => {
+    logger.info(`Создание комнаты "${name}" пользователем id: ${creatorId}`)
+
+    try {
+      const room = await roomRepository.create(name, creatorId)
+      if (!room) {
+        throw new AppError('Не удалось создать команту', 500)
+      }
+
+      // eventBus.emit(ROOM_CREATED, room)
+
+      return room
+    } catch (error) {
+      logger.error(
+        `При создании комнаты "${name}" пользователем id: ${creatorId} возникла ошибка: ${error.message.toLowerCase()}`
+      )
+
+      if (error instanceof AppError) {
+        throw error
+      }
+
+      throw new AppError(
+        'При создании комнаты возникла непредвиденная ошибка',
+        500
+      )
     }
-
-    roomRepository.create(room)
-
-    // eventBus.emit(ROOM_CREATED, room)
-
-    return room
   },
 
-  join: (userId: User['id'], roomId: Room['id']) => {
+  join: async (
+    roomId: Room['id'],
+    userId: User['id']
+  ): Promise<{ room: Room; messages: Message[] }> => {
+    logger.info(
+      `Пользователь id: ${userId} присоединяется к комнате id: ${roomId}`
+    )
+
     try {
-      const room = roomRepository.findById(roomId)
+      const room = await roomRepository.findById(roomId)
       if (!room) {
         throw new AppError(`Комната не найдена`)
       }
-      if (!room.participants.includes(userId)) {
-        roomRepository.update(roomId, {
-          ...room,
-          participants: [...room.participants, userId],
-        })
 
-        // eventBus.emit(ROOM_JOINED, { userId, roomId })
+      if (!room.participants.includes(userId)) {
+        await roomRepository.join(roomId, [...room.participants, userId])
       }
 
-      const messages = roomRepository.getMessages(roomId)
+      const messages = await messageRepository.get(roomId)
+
+      // eventBus.emit(ROOM_JOINED, { userId, roomId })
 
       return { room, messages }
     } catch (error) {
+      logger.error(
+        `При присоединении пользователя id: ${userId} к комнате id: ${roomId} возникла ошибка: ${error.message.toLowerCase()}`
+      )
+
       if (error instanceof AppError) {
         throw error
       }
@@ -49,23 +73,5 @@ export const roomService = {
         'При попытке присоединения к комнате возникла непредвиденная ошибка'
       )
     }
-  },
-
-  sendMessage: (
-    senderId: User['id'],
-    roomId: Room['id'],
-    content: Message['content']
-  ) => {
-    const message: Message = {
-      id: randomUUID(),
-      roomId,
-      senderId,
-      content,
-      timestamp: new Date(),
-    }
-
-    roomRepository.addMessage(roomId, message)
-
-    return message
   },
 }

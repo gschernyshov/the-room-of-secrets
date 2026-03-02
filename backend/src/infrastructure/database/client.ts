@@ -1,7 +1,17 @@
 import { Pool, QueryResultRow, types } from 'pg'
 import { logger } from '../../shared/utils/logger.js'
 
-type QueryParam = number | string | boolean | null | Date
+export type QueryParam =
+  | number
+  | string
+  | boolean
+  | null
+  | Date
+  | number[]
+  | string[]
+  | boolean[]
+  | null[]
+  | Date[]
 
 types.setTypeParser(1184, stringValue => {
   return new Date(stringValue)

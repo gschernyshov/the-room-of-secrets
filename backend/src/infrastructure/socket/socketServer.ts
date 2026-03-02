@@ -1,6 +1,6 @@
 import { Server } from 'socket.io'
 import { createServer } from 'http'
-import { roomHandler } from './handlers/room.handler.js'
+import { roomHandler } from './handlers/socket.handler.js'
 import { tokenService } from '../authentication/services/token.service.js'
 import { logger } from '../../shared/utils/logger.js'
 
@@ -11,7 +11,7 @@ export const initializeSocketServer = (
 
   const io = new Server(server, {
     cors: {
-      origin: '*',
+      origin: '*', // ['http://localhost:3000'],
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -22,7 +22,12 @@ export const initializeSocketServer = (
   })
 
   io.use((socket, next) => {
-    const token = socket.handshake.headers.authorization?.split(' ')[1]
+    const authHeader = socket.handshake.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next(new Error('Требуется аутентификация'))
+    }
+
+    const token = authHeader.split(' ')[1]
     if (!token) {
       return next(new Error('Требуется аутентификация'))
     }
@@ -35,7 +40,7 @@ export const initializeSocketServer = (
     socket.data.user = { id: tokenPayload.userId }
 
     logger.info(
-      `Сокет id: ${socket.id} аутентифицирован как пользователь с id: ${tokenPayload.userId}`
+      `Сокет id: ${socket.id} аутентифицирован как пользователь id: ${tokenPayload.userId}`
     )
 
     next()
@@ -44,26 +49,21 @@ export const initializeSocketServer = (
   io.on('connection', socket => {
     const userId = socket.data.user.id
 
-    if (!userId) {
-      socket.disconnect(true)
-      return
-    }
-
     logger.info(
-      `Пользователь с id: ${socket.data.user.id} подключился к серверу через сокет с id: ${socket.id}`
+      `Пользователь id: ${userId} подключился к серверу через сокет id: ${socket.id}`
     )
 
     roomHandler(socket, userId)
 
     socket.on('disconnect', reason => {
       logger.info(
-        `Пользователь с id: ${socket.data.user.id} отключился. Причина: ${reason}. Cокет id: ${socket.id}`
+        `Пользователь id: ${userId} отключился. Причина: ${reason}. Cокет id: ${socket.id}`
       )
     })
 
     socket.on('error', error => {
       logger.error(
-        `Ошибка сокета id: ${socket.id} пользователя с id: ${socket.data.user.id}: ${error}`
+        `Ошибка сокета id: ${socket.id} пользователя id: ${socket.data.user.id}: ${error}`
       )
     })
   })

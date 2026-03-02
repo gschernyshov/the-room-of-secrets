@@ -4,13 +4,12 @@ import {
   isValidName,
   isValidRoomId,
 } from '../validations/index.js'
-import type { SocketCallback } from '../types/room.type.js'
+import { type SocketCallback } from '../types/room.type.js'
 import { type User } from '../../../domains/user/types/user.type.js'
 import { roomService } from '../../../domains/room/services/room.service.js'
-import {
-  type Message,
-  type Room,
-} from '../../../domains/room/types/room.type.js'
+import { type Room } from '../../../domains/room/types/room.type.js'
+import { messageService } from '../../../domains/message/services/message.service.js'
+import { type Message } from '../../../domains/message/types/message.type.js'
 
 export const roomHandler = (socket: Socket, userId: User['id']) => {
   socket.on(
@@ -23,7 +22,7 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
         const { name } = payload as { name: unknown }
         if (!isValidName(name)) throw new Error('Невалидные данные')
 
-        const room = roomService.create(userId, name)
+        const room = await roomService.create(name, userId)
 
         await socket.join(room.id)
 
@@ -39,7 +38,7 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
     async (
       payload: unknown,
       callback?: SocketCallback<{
-        room: Omit<Room, 'id'>
+        room: Room
         messages: Array<Message>
       }>
     ) => {
@@ -50,7 +49,7 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
         const { roomId } = payload as { roomId: unknown }
         if (!isValidRoomId(roomId)) throw new Error('Невалидные данные')
 
-        const { room, messages } = roomService.join(userId, roomId)
+        const { room, messages } = await roomService.join(roomId, userId)
 
         await socket.join(roomId)
 
@@ -88,7 +87,15 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
         if (!isValidRoomId(roomId) || !isValidMessageContent(content))
           throw new Error('Невалидные данные')
 
-        const message = roomService.sendMessage(userId, roomId, content.trim())
+        if (!socket.rooms.has(roomId)) {
+          throw new Error('Доступ запрещён: вы не состоите в этой комнате')
+        }
+
+        const message = await messageService.send(
+          roomId,
+          userId,
+          content.trim()
+        )
 
         socket.to(roomId).emit('new_message', message)
 
@@ -102,20 +109,30 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
     }
   )
 
-  socket.on('leave_room', async (payload: unknown) => {
-    try {
-      if (!payload || typeof payload !== 'object' || !('roomId' in payload))
-        throw new Error('Невалидные данные')
+  socket.on(
+    'leave_room',
+    async (payload: unknown, callback?: SocketCallback) => {
+      try {
+        if (!payload || typeof payload !== 'object' || !('roomId' in payload))
+          throw new Error('Невалидные данные')
 
-      const { roomId } = payload as { roomId: unknown }
-      if (!isValidRoomId(roomId)) return
+        const { roomId } = payload as { roomId: unknown }
+        if (!isValidRoomId(roomId)) throw new Error('Невалидные данные')
 
-      await socket.leave(roomId)
+        await socket.leave(roomId)
 
-      socket.to(roomId).emit('user_left', {
-        userId,
-        timestamp: new Date().toISOString(),
-      })
-    } catch (_) {}
-  })
+        socket.to(roomId).emit('user_left', {
+          userId,
+          timestamp: new Date().toISOString(),
+        })
+
+        callback?.({ success: true })
+      } catch (error) {
+        callback?.({
+          success: false,
+          error: { message: error.message },
+        })
+      }
+    }
+  )
 }

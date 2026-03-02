@@ -1,31 +1,38 @@
-import { Room, Message } from '../types/room.type.js'
+import { Room } from '../types/room.type.js'
+import { User } from '../../user/types/user.type.js'
+import { db } from '../../../infrastructure/database/client.js'
 
 class RoomRepository {
-  private static readonly rooms = new Map<Room['id'], Omit<Room, 'id'>>()
-  private static readonly messages = new Map<Room['id'], Message[]>()
+  async create(
+    name: Room['name'],
+    creatorId: User['id']
+  ): Promise<Room | null> {
+    const [room] = await db.query<Room>(
+      `
+        INSERT INTO rooms (name, participants)
+        VALUES ($1, $2)
+        RETURNING id, name, participants, created_at AS createdAt
+        `,
+      [name, [creatorId]]
+    )
 
-  create(room: Room): void {
-    const { id, ...dataRoom } = room
-
-    RoomRepository.rooms.set(id, dataRoom)
-    RoomRepository.messages.set(id, [])
+    return room ?? null
   }
 
-  findById(roomId: Room['id']): Omit<Room, 'id'> | undefined {
-    return RoomRepository.rooms.get(roomId)
+  async findById(roomId: Room['id']): Promise<Room | null> {
+    const [room] = await db.query<Room>(
+      'SELECT id, name, participants, created_at AS createdAt FROM rooms WHERE id = $1',
+      [roomId]
+    )
+
+    return room ?? null
   }
 
-  update(roomId: Room['id'], dataRoom: Omit<Room, 'id'>): void {
-    RoomRepository.rooms.set(roomId, dataRoom)
-  }
-
-  addMessage(roomId: Room['id'], message: Message): void {
-    const messages = RoomRepository.messages.get(roomId) as Message[]
-    RoomRepository.messages.set(roomId, [...messages, message])
-  }
-
-  getMessages(roomId: Room['id']): Message[] {
-    return RoomRepository.messages.get(roomId) as Message[]
+  async join(roomId: Room['id'], participants: User['id'][]): Promise<void> {
+    await db.query<Room>('UPDATE rooms SET participants = $1 WHERE id = $2', [
+      participants,
+      roomId,
+    ])
   }
 }
 
