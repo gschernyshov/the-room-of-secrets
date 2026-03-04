@@ -22,9 +22,9 @@ router.post('/login', ...validateLogin, validateMiddleware, authHandler.login)
 
 router.post(
   '/logout',
+  authenticateMiddleware,
   ...validateLogout,
   validateMiddleware,
-  authenticateMiddleware,
   authHandler.logout
 )
 
