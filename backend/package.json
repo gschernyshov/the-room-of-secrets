@@ -1,5 +1,5 @@
 {
-  "name": "the-room-of-secrets-frontend-backend",
+  "name": "the-room-of-secrets-backend",
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
