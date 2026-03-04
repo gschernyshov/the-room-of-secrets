@@ -18,7 +18,7 @@ export const roomService = {
         throw new AppError('Не удалось создать команту', 500)
       }
 
-      // eventBus.emit(ROOM_CREATED, room)
+      eventBus.emit(ROOM_CREATED, room)
 
       return room
     } catch (error) {
@@ -57,7 +57,7 @@ export const roomService = {
 
       const messages = await messageRepository.get(roomId)
 
-      // eventBus.emit(ROOM_JOINED, { userId, roomId })
+      eventBus.emit(ROOM_JOINED, { roomId, name: room.name, userId })
 
       return { room, messages }
     } catch (error) {
