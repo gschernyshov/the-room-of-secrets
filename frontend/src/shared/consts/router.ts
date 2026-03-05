@@ -1,0 +1,11 @@
+export const AppRoutes = {
+  HOME: '/',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  ROOM: '/room',
+  NOT_FOUND: '*',
+} as const
+
+export const RoutePath = {
+  [AppRoutes.ROOM]: '/room/:id',
+} as const
