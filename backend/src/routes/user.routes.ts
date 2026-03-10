@@ -4,33 +4,33 @@ import {
   validateUpdateEmail,
   validateUpdatePassword,
 } from '../domains/user/validations/index.js'
-import { userHandler } from '../infrastructure/user/handlers/user.handler.js'
 import { validateMiddleware } from '../middlewares/validation.middleware.js'
 import { authenticateMiddleware } from '../infrastructure/authentication/middlewares/authenticate.middleware.js'
+import { userHandler } from '../infrastructure/user/handlers/user.handler.js'
 
 const router = Router()
 
 router.post(
   '/update/username',
-  authenticateMiddleware,
   ...validateUpdateUsername,
   validateMiddleware,
+  authenticateMiddleware,
   userHandler.updateUsername
 )
 
 router.post(
   '/update/email',
-  authenticateMiddleware,
   ...validateUpdateEmail,
   validateMiddleware,
+  authenticateMiddleware,
   userHandler.updateEmail
 )
 
 router.post(
   '/update/password',
-  authenticateMiddleware,
   ...validateUpdatePassword,
   validateMiddleware,
+  authenticateMiddleware,
   userHandler.updatePassword
 )
 

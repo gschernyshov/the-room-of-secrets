@@ -1,44 +1,48 @@
 import { Router } from 'express'
+import { authLimiterMiddleware } from '../middlewares/authLimter.middleware.js'
 import {
   validateRegister,
   validateLogin,
   validateLogout,
   validateRefresh,
 } from '../domains/authentication/validations/index.js'
-import { authHandler } from '../infrastructure/authentication/handlers/auth.handler.js'
 import { validateMiddleware } from '../middlewares/validation.middleware.js'
 import { authenticateMiddleware } from '../infrastructure/authentication/middlewares/authenticate.middleware.js'
+import { authHandler } from '../infrastructure/authentication/handlers/auth.handler.js'
 
 const router = Router()
 
 router.post(
   '/register',
+  authLimiterMiddleware,
   ...validateRegister,
   validateMiddleware,
   authHandler.register
 )
 
-router.post('/login', ...validateLogin, validateMiddleware, authHandler.login)
+router.post(
+  '/login',
+  authLimiterMiddleware,
+  ...validateLogin,
+  validateMiddleware,
+  authHandler.login
+)
 
 router.post(
   '/logout',
-  authenticateMiddleware,
+  authLimiterMiddleware,
   ...validateLogout,
   validateMiddleware,
+  authenticateMiddleware,
   authHandler.logout
 )
 
 router.post(
   '/refresh',
+  authLimiterMiddleware,
   ...validateRefresh,
   validateMiddleware,
   authHandler.refresh
 )
-
-router.get('/state', authenticateMiddleware, (_, res) => {
-  return res
-    .status(200)
-    .json({ success: true, data: { message: 'Пользователь авторизован' } })
-})
 
 export default router
