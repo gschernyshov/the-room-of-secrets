@@ -10,6 +10,8 @@ import { userHandler } from '../infrastructure/user/handlers/user.handler.js'
 
 const router = Router()
 
+router.get('/me', authenticateMiddleware, userHandler.me)
+
 router.post(
   '/update/username',
   ...validateUpdateUsername,

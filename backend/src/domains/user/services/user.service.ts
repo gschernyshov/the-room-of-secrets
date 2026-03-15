@@ -11,6 +11,22 @@ import { logger } from '../../../shared/utils/logger.js'
 import { AppError } from '../../../shared/utils/errors.js'
 
 export const userService = {
+  me: async (userId: User['id']): Promise<User> => {
+    try {
+      const user = await userRepository.findById(userId)
+      if (!user) {
+        throw new AppError('Пользователь не найден', 404)
+      }
+
+      return user
+    } catch (error) {
+      throw new AppError(
+        'При получении пользователя возникла непредвиденная ошибка',
+        500
+      )
+    }
+  },
+
   updateUsername: async (
     userId: User['id'],
     newUsername: User['username']
