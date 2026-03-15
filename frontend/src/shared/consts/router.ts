@@ -2,6 +2,7 @@ export const AppRoutes = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
+  PROFILE: '/profile',
   ROOM: '/room',
   NOT_FOUND: '*',
 } as const
