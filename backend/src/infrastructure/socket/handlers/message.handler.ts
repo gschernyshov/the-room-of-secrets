@@ -9,7 +9,10 @@ import { AppError } from '../../../shared/utils/errors.js'
 export const messageHandler = (socket: Socket, userId: User['id']) => {
   socket.on(
     'send_message',
-    async (payload: unknown, callback?: SocketCallback) => {
+    async (
+      payload: unknown,
+      callback?: SocketCallback
+    ): Promise<void | undefined> => {
       try {
         if (
           !payload ||
@@ -33,11 +36,7 @@ export const messageHandler = (socket: Socket, userId: User['id']) => {
           )
         }
 
-        const message = await messageService.send(
-          roomId,
-          userId,
-          content.trim()
-        )
+        const message = await messageService.send(roomId, userId, content)
 
         socket.to(roomId).emit('new_message', message)
 

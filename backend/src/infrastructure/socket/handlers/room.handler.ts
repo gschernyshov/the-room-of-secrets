@@ -11,7 +11,10 @@ import { AppError } from '../../../shared/utils/errors.js'
 export const roomHandler = (socket: Socket, userId: User['id']) => {
   socket.on(
     'create_room',
-    async (payload: unknown, callback?: SocketCallback<Room>) => {
+    async (
+      payload: unknown,
+      callback?: SocketCallback<Room>
+    ): Promise<void | undefined> => {
       try {
         if (!payload || typeof payload !== 'object' || !('name' in payload))
           throw new AppError('Невалидные данные', 400)
@@ -38,7 +41,7 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
         room: Room
         messages: Array<Message>
       }>
-    ) => {
+    ): Promise<void | undefined> => {
       try {
         if (!payload || typeof payload !== 'object' || !('roomId' in payload))
           throw new AppError('Невалидные данные', 400)
@@ -67,7 +70,10 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
 
   socket.on(
     'leave_room',
-    async (payload: unknown, callback?: SocketCallback) => {
+    async (
+      payload: unknown,
+      callback?: SocketCallback
+    ): Promise<void | undefined> => {
       try {
         if (!payload || typeof payload !== 'object' || !('roomId' in payload))
           throw new AppError('Невалидные данные', 400)
