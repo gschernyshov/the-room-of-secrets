@@ -1,7 +1,11 @@
+import { sessionService } from './session.service.js'
 import { USER_REGISTERED, USER_LOGIN } from '../events/index.js'
+import {
+  type CreateSessionResult,
+  type RefreshSessionResult,
+} from '../types/session.type.js'
 import { userRepository } from '../../user/repositories/user.repository.js'
 import { type User } from '../../user/types/user.type.js'
-import { sessionService } from './session.service.js'
 import { passwordService } from '../../../infrastructure/authentication/services/crypto.service.js'
 import { eventBus } from '../../../infrastructure/events/eventBus.js'
 import { logger } from '../../../shared/utils/logger.js'
@@ -12,9 +16,7 @@ export const authService = {
     username: User['username'],
     email: User['email'],
     password: User['password']
-  ) => {
-    logger.info(`Регистрация пользователя (${username}, ${email})`)
-
+  ): Promise<CreateSessionResult & { user: User }> => {
     try {
       const existingUser = await userRepository.findByEmailOrUsername(
         email,
@@ -34,14 +36,13 @@ export const authService = {
         throw new AppError('Не удалось создать пользователя', 500)
       }
 
-      const { accessToken, refreshToken } = await sessionService.create(user.id)
+      const tokens = await sessionService.create(user.id)
 
       eventBus.emit(USER_REGISTERED, user)
 
       return {
-        accessToken,
-        refreshToken,
-        user: { id: user.id, username: user.username, email: user.email },
+        ...tokens,
+        user,
       }
     } catch (error) {
       logger.error(
@@ -59,13 +60,16 @@ export const authService = {
     }
   },
 
-  login: async (email: User['email'], password: User['password']) => {
+  login: async (
+    email: User['email'],
+    password: User['password']
+  ): Promise<CreateSessionResult & { user: User }> => {
     logger.info(`Авторизация пользователя с email: ${email}`)
 
     try {
       const user = await userRepository.findByEmail(email)
       if (!user) {
-        throw new AppError('Неверный email или пароль', 401)
+        throw new AppError('Неверный email или пароль', 401, 'AUTH_FAILED')
       }
 
       const isPasswordValid = await passwordService.compare(
@@ -73,17 +77,16 @@ export const authService = {
         user.password
       )
       if (!isPasswordValid) {
-        throw new AppError('Неверный email или пароль', 401)
+        throw new AppError('Неверный email или пароль', 401, 'AUTH_FAILED')
       }
 
-      const { accessToken, refreshToken } = await sessionService.create(user.id)
+      const tokens = await sessionService.create(user.id)
 
       eventBus.emit(USER_LOGIN, user)
 
       return {
-        accessToken,
-        refreshToken,
-        user: { id: user.id, username: user.username, email: user.email },
+        ...tokens,
+        user,
       }
     } catch (error) {
       logger.error(
@@ -96,12 +99,13 @@ export const authService = {
 
       throw new AppError(
         'При авторизации пользователя возникла непредвиденная ошибка',
-        500
+        500,
+        'AUTH_FAILED'
       )
     }
   },
 
-  logout: async (userId: User['id'], refreshToken: string) => {
+  logout: async (userId: User['id'], refreshToken: string): Promise<void> => {
     try {
       await sessionService.invalidate(userId, refreshToken)
 
@@ -119,15 +123,9 @@ export const authService = {
     }
   },
 
-  refresh: async (refreshToken: string) => {
+  refresh: async (refreshToken: string): Promise<RefreshSessionResult> => {
     try {
-      const { accessToken, newRefreshToken } =
-        await sessionService.refresh(refreshToken)
-
-      return {
-        accessToken,
-        refreshToken: newRefreshToken,
-      }
+      return await sessionService.refresh(refreshToken)
     } catch (error) {
       logger.error(
         `При выдаче access token и refresh token возникла ошибка: ${error.message.toLowerCase()}`

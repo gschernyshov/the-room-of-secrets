@@ -1,65 +1,99 @@
 import { Request, Response } from 'express'
 import { authService } from '../../../domains/authentication/services/auth.service.js'
+import { parseTTL } from '../../../shared/utils/parseTTL.js'
+
+const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
+
+const REFRESH_TOKEN_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  path: '/',
+  maxAge: parseTTL(REFRESH_TOKEN_EXPIRES_IN) * 1000,
+}
+
+const CLEAR_REFRESH_TOKEN_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  path: '/',
+}
 
 export const authHandler = {
-  register: async (req: Request, res: Response) => {
+  register: async (req: Request, res: Response): Promise<Response> => {
     const { username, email, password } = req.body
 
     try {
-      const result = await authService.register(username, email, password)
+      const { refreshToken, ...data } = await authService.register(
+        username,
+        email,
+        password
+      )
 
-      res.status(201).json({
+      res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS)
+
+      return res.status(201).json({
         success: true,
-        data: result,
+        data,
       })
     } catch (error) {
-      res
+      return res
         .status(error.statusCode)
         .json({ success: false, error: { message: error.message } })
     }
   },
 
-  login: async (req: Request, res: Response) => {
+  login: async (req: Request, res: Response): Promise<Response> => {
     const { email, password } = req.body
 
     try {
-      const result = await authService.login(email, password)
+      const { refreshToken, ...data } = await authService.login(email, password)
 
-      res.status(200).json({
+      res.cookie('refreshToken', refreshToken, REFRESH_TOKEN_COOKIE_OPTIONS)
+
+      return res.status(200).json({
         success: true,
-        data: result,
+        data,
       })
     } catch (error) {
-      res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      return res.status(error.statusCode).json({
+        success: false,
+        error: { message: error.message, type: error.type },
+      })
     }
   },
 
-  logout: async (req: Request, res: Response) => {
+  logout: async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user.id
-    const refreshToken = req.body.refreshToken
+    const refreshToken = req.cookies.refreshToken
+
+    res.clearCookie('refreshToken', CLEAR_REFRESH_TOKEN_COOKIE_OPTIONS)
 
     try {
       await authService.logout(userId, refreshToken)
 
       return res.status(200).json({ success: true })
     } catch (error) {
-      res
+      return res
         .status(error.statusCode)
         .json({ success: false, error: { message: error.message } })
     }
   },
 
-  refresh: async (req: Request, res: Response) => {
-    const refreshToken = req.body.refreshToken
+  refresh: async (req: Request, res: Response): Promise<Response> => {
+    const refreshToken = req.cookies.refreshToken
+
+    res.clearCookie('refreshToken', CLEAR_REFRESH_TOKEN_COOKIE_OPTIONS)
 
     try {
-      await authService.refresh(refreshToken)
+      const { newAccessToken, newRefreshToken } =
+        await authService.refresh(refreshToken)
 
-      return res.status(200).json({ success: true })
+      res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS)
+
+      return res.status(200).json({ success: true, data: { newAccessToken } })
     } catch (error) {
-      res
+      return res
         .status(error.statusCode)
         .json({ success: false, error: { message: error.message } })
     }

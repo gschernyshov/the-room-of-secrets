@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { TokenPayload } from '../types/token.type.js'
+import { type Token, type TokenPayload } from '../types/token.type.js'
 import { type User } from '../../../domains/user/types/user.type.js'
 
 const ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_TOKEN_SECRET
@@ -7,7 +7,7 @@ const ACCESS_TOKEN_EXPIRES_IN = process.env.JWT_ACCESS_TOKEN_EXPIRES_IN
 const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_TOKEN_SECRET
 const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
 
-type GenerateTokensResult = Record<'accessToken' | 'refreshToken', string>
+type GenerateTokensResult = Record<'accessToken' | 'refreshToken', Token>
 type VerifyTokenResult = TokenPayload | null
 
 export const tokenService = {

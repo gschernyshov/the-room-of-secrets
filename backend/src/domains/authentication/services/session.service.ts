@@ -1,11 +1,12 @@
-import { tokenService } from '../../../infrastructure/authentication/services/token.service.js'
 import { tokenRepository } from '../repositories/token.repository.js'
+import {
+  type CreateSessionResult,
+  type RefreshSessionResult,
+} from '../types/session.type.js'
 import { type User } from '../../user/types/user.type.js'
+import { tokenService } from '../../../infrastructure/authentication/services/token.service.js'
 import { logger } from '../../../shared/utils/logger.js'
 import { AppError } from '../../../shared/utils/errors.js'
-
-type CreateSessionResult = Record<'accessToken' | 'refreshToken', string>
-type RefreshSessionResult = Record<'accessToken' | 'newRefreshToken', string>
 
 export const sessionService = {
   create: async (userId: User['id']): Promise<CreateSessionResult> => {
@@ -62,12 +63,12 @@ export const sessionService = {
       throw new AppError('Неверный refresh token', 401)
     }
 
-    const { accessToken, refreshToken: newRefreshToken } =
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
       tokenService.generateTokens(storedUserId)
 
     await tokenRepository.removeRefreshToken(storedUserId, refreshToken)
     await tokenRepository.saveRefreshToken(storedUserId, newRefreshToken)
 
-    return { accessToken, newRefreshToken }
+    return { newAccessToken, newRefreshToken }
   },
 }
