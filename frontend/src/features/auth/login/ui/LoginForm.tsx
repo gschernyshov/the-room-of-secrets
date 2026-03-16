@@ -6,6 +6,7 @@ import { loginSchema, type LoginFormData } from '../lib/loginSchema'
 import { initLoginFormData } from '../model/initLoginFormData'
 import { AppError } from '@/shared/utils/errors'
 import { safeJsonParse } from '@/shared/utils/safeJsonParse'
+import styles from './LoginForm.module.scss'
 
 const LOGIN_FORM_FIELDS = {
   login: 'email',
@@ -71,40 +72,59 @@ export const LoginForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <h2>Вход</h2>
+    <div className={styles.container}>
+      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <h2>Вход</h2>
 
-      {errors.root && <div>{errors.root?.message}</div>}
+        {errors.root && (
+          <div className={styles.error}>{errors.root?.message}</div>
+        )}
 
-      <div>
-        <label>Email</label>
-        <TextInput
-          size="m"
-          pin="round-brick"
+        <div className={styles.field}>
+          <label>Email</label>
+          <TextInput
+            size="xl"
+            pin="round-round"
+            disabled={isSubmitting}
+            placeholder="Введите email"
+            validationState={errors.email ? 'invalid' : undefined}
+            errorMessage={errors.email?.message}
+            {...register(LOGIN_FORM_FIELDS.login)}
+            style={{
+              '--g-text-input-border-color': 'white',
+              '--g-text-input-border-radius': '100px',
+            }}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label>Пароль</label>
+          <PasswordInput
+            size="xl"
+            pin="round-round"
+            disabled={isSubmitting}
+            placeholder="Введите пароль"
+            validationState={errors.password ? 'invalid' : undefined}
+            errorMessage={errors.password?.message}
+            {...register(LOGIN_FORM_FIELDS.password)}
+            style={{
+              '--g-text-input-border-color': 'white',
+              '--g-text-input-border-radius': '100px',
+            }}
+          />
+        </div>
+
+        <Button
+          view="action"
+          type="submit"
+          size="xl"
+          pin="circle-circle"
           disabled={isSubmitting}
-          placeholder="Введите email"
-          validationState={errors.email ? 'invalid' : undefined}
-          errorMessage={errors.email?.message}
-          {...register(LOGIN_FORM_FIELDS.login)}
-        />
-      </div>
-
-      <div>
-        <label>Пароль</label>
-        <PasswordInput
-          size="m"
-          pin="round-brick"
-          disabled={isSubmitting}
-          placeholder="Введите пароль"
-          validationState={errors.password ? 'invalid' : undefined}
-          errorMessage={errors.password?.message}
-          {...register(LOGIN_FORM_FIELDS.password)}
-        />
-      </div>
-
-      <Button size="m" type="submit" view="action" disabled={isSubmitting}>
-        {isSubmitting ? 'Вход...' : 'Войти'}
-      </Button>
-    </form>
+          style={{ '--g-button-background-color': 'rgb(222, 222, 222)' }}
+        >
+          {isSubmitting ? 'Вход...' : 'Войти'}
+        </Button>
+      </form>
+    </div>
   )
 }
