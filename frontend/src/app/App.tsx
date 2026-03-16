@@ -1,12 +1,12 @@
-import { createAppRouter } from '@/app/router'
 import { RouterProvider } from 'react-router-dom'
-import { AuthProvider } from './providers/AuthProvider'
+import { Providers } from './providers'
+import { createAppRouter } from '@/app/router'
 
 const App = () => {
   return (
-    <AuthProvider>
+    <Providers>
       <RouterProvider router={createAppRouter()} />
-    </AuthProvider>
+    </Providers>
   )
 }
 
