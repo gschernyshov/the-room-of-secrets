@@ -1,8 +1,9 @@
 export class AppError extends Error {
-  constructor(message: string) {
+  constructor(
+    message: string,
+    public details?: unknown
+  ) {
     super(message)
     this.name = 'AppError'
-
-    Object.setPrototypeOf(this, new.target.prototype)
   }
 }

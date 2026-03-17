@@ -1,19 +1,19 @@
 import { useLocation } from 'react-router-dom'
-import { type LoginFormData } from './loginSchema'
+import { type RegisterFormData } from './registerSchema'
 import { useSessionStore } from '@/entities/session/model/store'
 import { apiFetch } from '@/shared/api/apiFetch'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 import { AppError } from '@/shared/utils/errors'
 import { AppRoutes } from '@/shared/consts/router'
 
-export const useLogin = () => {
+export const useRegister = () => {
   const { navigate } = useAppNavigate()
   const location = useLocation()
   const state = location.state
 
-  const handleLogin = async (data: LoginFormData) => {
+  const handleRegister = async (data: RegisterFormData) => {
     try {
-      const response = await apiFetch('/auth/login', {
+      const response = await apiFetch('/auth/register', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -31,16 +31,16 @@ export const useLogin = () => {
         navigate(from, { replace: true })
       } else {
         throw new AppError(
-          'При авторизации возникла непредвиденная ошибка',
+          'При регистрации возникла непредвиденная ошибка',
           result.error.message
         )
       }
     } catch (error) {
       if (error instanceof AppError) throw error
 
-      throw new AppError('При авторизации возникла непредвиденная ошибка')
+      throw new AppError('При регистрации возникла непредвиденная ошибка')
     }
   }
 
-  return { handleLogin }
+  return { handleRegister }
 }

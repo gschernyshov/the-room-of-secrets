@@ -96,7 +96,7 @@ export const apiFetch = async (
       REFRESH_TIMEOUT
     )
     try {
-      const refreshResponse = await fetch(`${API_URL}/api/auth/refresh`, {
+      const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

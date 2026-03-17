@@ -30,17 +30,16 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
   },
 
   init: async () => {
-    const token = tokenService.get()
-    if (!token) {
-      set({ status: 'unauthenticated', user: null })
-      return
-    }
+    // НЕАКТУАЛЬНО, Т. К. ВРЕМЯ ЖИЗНИ ACCESS TOKEN СИНХРОНИЗИРОВАНО С СЕРВЕРОМ
+    // const token = tokenService.get()
+    // if (!token) {
+    //   set({ status: 'unauthenticated', user: null })
+    //   return
+    // }
 
     try {
       const response = await apiFetch('/user/me')
       const result = await response.json()
-
-      console.log(result)
 
       if (result.succces) {
         set({ status: 'authenticated', user: result.data })

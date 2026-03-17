@@ -1,33 +1,33 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, PasswordInput, Button } from '@gravity-ui/uikit'
-import { useLogin } from '../lib/useLogin'
-import { loginSchema, type LoginFormData } from '../lib/loginSchema'
-import { initLoginFormData, fieldNames } from '../model/initLoginFormData'
+import { useRegister } from '../lib/useRegister'
+import { registerSchema, type RegisterFormData } from '../lib/registerSchema'
+import { initRegisterData, fieldNames } from '../model/initRegisterData'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
-import styles from './LoginForm.module.scss'
+import styles from './RegisterForm.module.scss'
 
-export const LoginForm = () => {
+export const RegisterForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
-      ...initLoginFormData,
+      ...initRegisterData,
     },
   })
-  const { handleLogin } = useLogin()
-  const handleErrors = createHandleFormErrors<LoginFormData>(
+  const { handleRegister } = useRegister()
+  const handleErrors = createHandleFormErrors<RegisterFormData>(
     fieldNames,
     setError
   )
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      await handleLogin(data)
+      await handleRegister(data)
     } catch (error) {
       handleErrors(error)
     }
@@ -36,11 +36,28 @@ export const LoginForm = () => {
   return (
     <div className={styles.container}>
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <h2>Вход</h2>
+        <h2>Регистрация</h2>
 
         {errors.root && (
           <div className={styles.error}>{errors.root?.message}</div>
         )}
+
+        <div className={styles.field}>
+          <label>Username</label>
+          <TextInput
+            size="xl"
+            pin="round-round"
+            disabled={isSubmitting}
+            placeholder="Введите username"
+            validationState={errors.username ? 'invalid' : undefined}
+            errorMessage={errors.username?.message}
+            {...register('username')}
+            style={{
+              '--g-text-input-border-color': 'white',
+              '--g-text-input-border-radius': '100px',
+            }}
+          />
+        </div>
 
         <div className={styles.field}>
           <label>Email</label>
@@ -84,7 +101,7 @@ export const LoginForm = () => {
           disabled={isSubmitting}
           style={{ '--g-button-background-color': 'rgb(222, 222, 222)' }}
         >
-          {isSubmitting ? 'Вход...' : 'Войти'}
+          {isSubmitting ? 'Регистрация...' : 'Регистрация'}
         </Button>
       </form>
     </div>
