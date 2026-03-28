@@ -9,7 +9,7 @@ export const userHandler = {
       const user = await userService.me(userId)
 
       res.status(200).json({
-        succces: true,
+        success: true,
         data: user,
       })
     } catch (error) {
