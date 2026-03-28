@@ -1,34 +1,53 @@
-import { useNavigate, type NavigateOptions } from 'react-router-dom'
+import { useCallback } from 'react'
+import {
+  useNavigate,
+  useLocation,
+  type NavigateOptions,
+} from 'react-router-dom'
 import { AppRoutes } from '@/shared/consts/router'
 
 export const useAppNavigate = () => {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
 
-  const goToHome = (params?: NavigateOptions) => {
-    navigate(AppRoutes.HOME, params)
-  }
+  const goToHome = useCallback(
+    (params?: NavigateOptions) => {
+      navigate(AppRoutes.HOME, params)
+    },
+    [navigate]
+  )
 
-  const goToRegister = (params?: NavigateOptions) => {
-    navigate(AppRoutes.REGISTER, params)
-  }
+  const goToLogin = useCallback(
+    (params?: NavigateOptions) => {
+      navigate(AppRoutes.LOGIN, params)
+    },
+    [navigate]
+  )
 
-  const goToLogin = (params?: NavigateOptions) => {
-    navigate(AppRoutes.LOGIN, params)
-  }
+  const goToRegister = useCallback(
+    (params?: NavigateOptions) => {
+      navigate(AppRoutes.REGISTER, params)
+    },
+    [navigate]
+  )
 
-  const goToRoom = (id: string, params?: NavigateOptions) => {
-    navigate(AppRoutes.ROOM.replace(':id', id), params)
-  }
+  const goToRoom = useCallback(
+    (id: string, params?: NavigateOptions) => {
+      navigate(AppRoutes.ROOM.replace(':id', id), params)
+    },
+    [navigate]
+  )
 
-  const goBack = () => {
+  const goBack = useCallback(() => {
     navigate(-1)
-  }
+  }, [navigate])
 
-  const goForward = () => {
+  const goForward = useCallback(() => {
     navigate(1)
-  }
+  }, [navigate])
 
   return {
+    pathname,
     navigate,
     goToHome,
     goToLogin,

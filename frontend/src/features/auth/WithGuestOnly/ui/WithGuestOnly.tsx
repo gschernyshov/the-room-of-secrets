@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { useSessionStore } from '@/entities/session/model/store'
+import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { AppNavigate } from '@/shared/lib/router/AppNavigate'
 
 type Props = {

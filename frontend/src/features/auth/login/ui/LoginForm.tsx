@@ -4,6 +4,7 @@ import { TextInput, PasswordInput, Button } from '@gravity-ui/uikit'
 import { useLogin } from '../lib/useLogin'
 import { loginSchema, type LoginFormData } from '../lib/loginSchema'
 import { initLoginFormData, fieldNames } from '../model/initLoginFormData'
+import { useShowAlert } from '@/widgets/globalAlert'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
 import styles from './LoginForm.module.scss'
 
@@ -20,29 +21,33 @@ export const LoginForm = () => {
     },
   })
   const { handleLogin } = useLogin()
+  const { successAlert } = useShowAlert()
   const handleErrors = createHandleFormErrors<LoginFormData>(
     fieldNames,
     setError
   )
 
   const onSubmit = async (data: LoginFormData) => {
+    if (isSubmitting) return
+
     try {
       await handleLogin(data)
+      successAlert('Вход в систему', 'Вы успешно вошли в систему')
     } catch (error) {
       handleErrors(error)
     }
   }
 
   return (
-    <div className={styles.container}>
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <h2>Вход</h2>
+    <div className={styles['container']}>
+      <form onSubmit={handleSubmit(onSubmit)} className={styles['form']}>
+        <h2 className={styles['form__title']}>Вход</h2>
 
         {errors.root && (
-          <div className={styles.error}>{errors.root?.message}</div>
+          <div className={styles['form__error']}>{errors.root?.message}</div>
         )}
 
-        <div className={styles.field}>
+        <div className={styles['form__field']}>
           <label>Email</label>
           <TextInput
             size="xl"
@@ -59,7 +64,7 @@ export const LoginForm = () => {
           />
         </div>
 
-        <div className={styles.field}>
+        <div className={styles['form__field']}>
           <label>Пароль</label>
           <PasswordInput
             size="xl"
@@ -82,6 +87,7 @@ export const LoginForm = () => {
           size="xl"
           pin="circle-circle"
           disabled={isSubmitting}
+          loading={isSubmitting}
           style={{ '--g-button-background-color': 'rgb(222, 222, 222)' }}
         >
           {isSubmitting ? 'Вход...' : 'Войти'}

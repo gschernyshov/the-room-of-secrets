@@ -1,4 +1,4 @@
-import { useSessionStore } from '@/entities/session/model/store'
+import { useSessionStore } from '@/entities/session/model/sessionStore'
 
 export const ProfilePage = () => {
   const user = useSessionStore(state => state.user)

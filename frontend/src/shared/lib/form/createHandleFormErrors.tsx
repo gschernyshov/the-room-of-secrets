@@ -9,34 +9,32 @@ export const createHandleFormErrors = <T extends FieldValues>(
   fieldNames: readonly (keyof T)[],
   setError: UseFormSetError<T>
 ) => {
-  const UNEXPECTED_ERROR = {
-    type: 'server',
-    message: 'Произошла непредвиденная ошибка',
-  } as const
-
   return (error: unknown): boolean => {
     // Возвращаем флаг, чтобы сообщить "известного" ли типа ошибка
 
     if (!(error instanceof AppError)) {
-      setError('root', UNEXPECTED_ERROR)
+      setError('root', {
+        type: 'server',
+        message: 'Произошла непредвиденная ошибка',
+      })
       return false
     }
 
-    const errors = error.details
+    const errorDetails = error.details
 
-    if (Array.isArray(errors)) {
+    if (Array.isArray(errorDetails)) {
       let hasErrors = false
       let rootErrorMessage = ''
 
-      errors.forEach(error => {
+      errorDetails.forEach(errorDetail => {
         if (
-          error &&
-          typeof error === 'object' &&
-          ('path' in error || 'param' in error) &&
-          'msg' in error
+          errorDetail &&
+          typeof errorDetail === 'object' &&
+          ('path' in errorDetail || 'param' in errorDetail) &&
+          'msg' in errorDetail
         ) {
-          const path = error.path || error.param
-          const message = error.msg
+          const path = errorDetail.path || errorDetail.param
+          const message = errorDetail.msg
 
           if (typeof path === 'string' && typeof message === 'string') {
             if (fieldNames.includes(path)) {
@@ -47,7 +45,7 @@ export const createHandleFormErrors = <T extends FieldValues>(
               hasErrors = true
             } else {
               if (rootErrorMessage) {
-                rootErrorMessage += '\n'
+                rootErrorMessage += '. '
               }
               rootErrorMessage += message
             }
@@ -66,15 +64,18 @@ export const createHandleFormErrors = <T extends FieldValues>(
       return hasErrors
     }
 
-    if (typeof errors === 'string') {
+    if (typeof errorDetails === 'string') {
       setError('root', {
         type: 'server',
-        message: errors,
+        message: errorDetails,
       })
       return true
     }
 
-    setError('root', UNEXPECTED_ERROR)
+    setError('root', {
+      type: 'server',
+      message: error.message,
+    })
     return false
   }
 }

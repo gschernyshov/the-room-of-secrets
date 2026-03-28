@@ -4,6 +4,7 @@ import { TextInput, PasswordInput, Button } from '@gravity-ui/uikit'
 import { useRegister } from '../lib/useRegister'
 import { registerSchema, type RegisterFormData } from '../lib/registerSchema'
 import { initRegisterData, fieldNames } from '../model/initRegisterData'
+import { useShowAlert } from '@/widgets/globalAlert'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
 import styles from './RegisterForm.module.scss'
 
@@ -20,29 +21,36 @@ export const RegisterForm = () => {
     },
   })
   const { handleRegister } = useRegister()
+  const { successAlert } = useShowAlert()
   const handleErrors = createHandleFormErrors<RegisterFormData>(
     fieldNames,
     setError
   )
 
   const onSubmit = async (data: RegisterFormData) => {
+    if (isSubmitting) return
+
     try {
       await handleRegister(data)
+      successAlert(
+        'Регистрация в системе',
+        'Вы успешно зарегистрировались в системе'
+      )
     } catch (error) {
       handleErrors(error)
     }
   }
 
   return (
-    <div className={styles.container}>
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        <h2>Регистрация</h2>
+    <div className={styles['container']}>
+      <form onSubmit={handleSubmit(onSubmit)} className={styles['form']}>
+        <h2 className={styles['form__title']}>Регистрация</h2>
 
         {errors.root && (
-          <div className={styles.error}>{errors.root?.message}</div>
+          <div className={styles['form__error']}>{errors.root?.message}</div>
         )}
 
-        <div className={styles.field}>
+        <div className={styles['form__field']}>
           <label>Username</label>
           <TextInput
             size="xl"
@@ -59,7 +67,7 @@ export const RegisterForm = () => {
           />
         </div>
 
-        <div className={styles.field}>
+        <div className={styles['form__field']}>
           <label>Email</label>
           <TextInput
             size="xl"
@@ -76,7 +84,7 @@ export const RegisterForm = () => {
           />
         </div>
 
-        <div className={styles.field}>
+        <div className={styles['form__field']}>
           <label>Пароль</label>
           <PasswordInput
             size="xl"
@@ -99,6 +107,7 @@ export const RegisterForm = () => {
           size="xl"
           pin="circle-circle"
           disabled={isSubmitting}
+          loading={isSubmitting}
           style={{ '--g-button-background-color': 'rgb(222, 222, 222)' }}
         >
           {isSubmitting ? 'Регистрация...' : 'Регистрация'}

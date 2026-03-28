@@ -1,12 +1,12 @@
 import { HomePage } from '@/pages/hoom'
 import { LoginPage } from '@/pages/login'
 import { RegisterPage } from '@/pages/register'
-import { ProfilePage } from '@/pages/profile'
 import { RoomPage } from '@/pages/room'
 import { NotFoundPage } from '@/pages/notFound'
-import { WithAuthRequire } from '@/features/auth/WithAuthRequire/ui/WithAuthRequire'
+import { WithGuestOnly } from '@/features/auth/withGuestOnly/ui/WithGuestOnly'
+import { WithAuthRequire } from '@/features/auth/withAuthRequire/ui/WithAuthRequire'
 import { AppRoutes } from '@/shared/consts/router'
-import { WithGuestOnly } from '@/features/auth/WithGuestOnly/WithGuestOnly'
+import { ProfilePage } from '@/pages/profile'
 
 export const routeConfig = [
   { path: AppRoutes.HOME, element: <HomePage /> },
