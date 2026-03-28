@@ -126,7 +126,8 @@ export const apiFetch = async (
         return retryResponse
       } else {
         throw new AppError(
-          refreshResult?.error?.message || 'Не удалось обновить токен'
+          'При обновлении токена возникла непредвиденная ошибка',
+          refreshResult?.error?.message
         )
       }
     } catch (error) {
