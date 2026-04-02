@@ -21,7 +21,7 @@ export default defineConfig({
   },
   server: {
     host: true,
-    port: Number(process.env.PORT ?? '8003'),
+    port: Number(process.env.FRONTEND_PORT ?? '8003'),
     strictPort: true,
   },
 })

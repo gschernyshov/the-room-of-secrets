@@ -6,7 +6,9 @@ node_modules/
 .env.example
 
 # === Build artifacts ===
-dist/
+# dist/
+# необходимо, чтобы Docker мог скопировать папку dist
+# через COPY --from=builder в многоступенчатой сборке
 
 # === Logs ===
 logs/

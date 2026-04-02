@@ -2,11 +2,16 @@
 node_modules/
 
 # === Environment ===
-.env
+# .env
+# не игнорируем .env, потому что он нужен на этапе сборки (vite build),
+# используется в Dockerfile.prod: COPY . . для подстановки VITE_* переменных
 .env.example
 
+
 # === Build artifacts ===
-dist/
+# dist/
+# необходимо, чтобы Docker мог скопировать папку dist
+# через COPY --from=builder в многоступенчатой сборке
 
 # === Logs ===
 logs/
