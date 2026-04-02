@@ -23,7 +23,7 @@ export const useRegister = () => {
       const result = await response.json()
 
       if (result.success) {
-        const { accessToken, ...user } = result.data
+        const { accessToken, user } = result.data
 
         useSessionStore.getState().login(accessToken, user)
 

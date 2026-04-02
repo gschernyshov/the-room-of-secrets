@@ -31,6 +31,13 @@ export const useAppNavigate = () => {
     [navigate]
   )
 
+  const goToProfile = useCallback(
+    (params?: NavigateOptions) => {
+      navigate(AppRoutes.PROFILE, params)
+    },
+    [navigate]
+  )
+
   const goToRoom = useCallback(
     (id: string, params?: NavigateOptions) => {
       navigate(AppRoutes.ROOM.replace(':id', id), params)
@@ -52,6 +59,7 @@ export const useAppNavigate = () => {
     goToHome,
     goToLogin,
     goToRegister,
+    goToProfile,
     goToRoom,
     goBack,
     goForward,

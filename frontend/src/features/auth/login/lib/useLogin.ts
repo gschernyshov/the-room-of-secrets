@@ -23,7 +23,9 @@ export const useLogin = () => {
       const result = await response.json()
 
       if (result.success) {
-        const { accessToken, ...user } = result.data
+        const { accessToken, user } = result.data
+
+        console.log(user)
 
         useSessionStore.getState().login(accessToken, user)
 

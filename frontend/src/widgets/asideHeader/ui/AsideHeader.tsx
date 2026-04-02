@@ -1,17 +1,19 @@
+import clsx from 'clsx'
 import { useRef, useMemo, useCallback } from 'react'
 import { AsideHeader as GravityAsideHeader } from '@gravity-ui/navigation'
 import { CardClub } from '@gravity-ui/icons'
-import { GuestMenuItems, AuthMenuItems } from './menuItems'
-import { Footer } from './footer'
+import { Footer } from './Footer'
+import { AsideBackground } from './AsideBackground'
+import { ID_TO_ROUTE, buildGuestMenuItems, buildAuthMenuItems } from '../сonfig'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { useLocalStorage } from '@/shared/lib/hooks/useLocalStorage'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
-import { CustomAsideBackground } from '@/shared/ui/CustomAsideBackground'
 import styles from './AsideHeader.module.scss'
 
 export const AsideHeader = () => {
-  const { pathname, goToLogin, goToRegister, goToHome } = useAppNavigate()
+  const { pathname, goToLogin, goToRegister, goToHome, goToProfile } =
+    useAppNavigate()
   const status = useSessionStore(state => state.status)
   const asideRef = useRef<HTMLDivElement>(null)
   const [compact, setCompact] = useLocalStorage('aside-open', true)
@@ -33,16 +35,28 @@ export const AsideHeader = () => {
     setCompact(true)
   }, [goToRegister, setCompact])
 
+  const handleProfile = useCallback(() => {
+    goToProfile()
+    setCompact(true)
+  }, [goToProfile, setCompact])
+
   const menuItems = useMemo(() => {
     if (status !== 'authenticated') {
-      return GuestMenuItems({
-        pathname: pathname,
+      return buildGuestMenuItems({
         onLogin: handleLogin,
         onRegister: handleRegister,
       })
     }
-    return AuthMenuItems()
-  }, [status, pathname, handleLogin, handleRegister])
+    return buildAuthMenuItems()
+  }, [status, handleLogin, handleRegister])
+
+  const menuItemsWithStyles = menuItems.map(item => ({
+    ...item,
+    className: clsx(
+      styles['aside-header__item'],
+      pathname === ID_TO_ROUTE[item.id] && styles['aside-header__item_active']
+    ),
+  }))
 
   return (
     <div ref={asideRef} className={styles['aside-header']}>
@@ -56,11 +70,13 @@ export const AsideHeader = () => {
           textSize: 16,
           onClick: () => goToHome(),
         }} // Контейнер логотипа, включающий иконку с заголовком и обрабатывающий клики
-        menuItems={menuItems} // Элементы в среднем блоке навигации
+        menuItems={menuItemsWithStyles} // Элементы в среднем блоке навигации
         menuMoreTitle="..." // Дополнительный заголовок для menuItems, если элементы не помещаются
-        renderFooter={data => <Footer {...data} />}
+        renderFooter={() => (
+          <Footer compact={compact} handleProfile={handleProfile} />
+        )}
         multipleTooltip={false} // Отображает несколько тултипов при наведении на элементы меню (menuItems) в свернутом состоянии
-        customBackground={<CustomAsideBackground />} // Фон AsideHeader
+        customBackground={<AsideBackground />} // Фон AsideHeader
         hideCollapseButton={false} // Скрывает CollapseButton
       />
     </div>

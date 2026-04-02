@@ -1,0 +1,37 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 10px;
+
+  &__profile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    cursor: pointer;
+  }
+
+  &__profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__profile-name {
+    font-size: 16px;
+  }
+
+  &__profile-email {
+    font-size: 14px;
+    color: gray;
+  }
+
+  &__logout {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+}
