@@ -7,7 +7,7 @@ import { startMessageFlushWorker } from './infrastructure/background/messageFlus
 import { logger } from './shared/utils/logger.js'
 
 const server = http.createServer(app)
-const PORT = process.env.PORT || 5005
+const PORT = process.env.PORT || 8000
 
 const startServer = async () => {
   logger.progress('Запуск сервера...')

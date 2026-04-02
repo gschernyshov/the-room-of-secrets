@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-
+import 'dotenv/config'
 import path from 'path'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 const paths = (p: string) => path.resolve(__dirname, p)
@@ -18,5 +18,10 @@ export default defineConfig({
       '@/entities': paths('src/entities'),
       '@/shared': paths('src/shared'),
     },
+  },
+  server: {
+    host: true,
+    port: Number(process.env.PORT ?? '8003'),
+    strictPort: true,
   },
 })

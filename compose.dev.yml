@@ -1,0 +1,98 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: room_backend
+    ports:
+      - '${BACKEND_PORT}:${BACKEND_PORT}'
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=development
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  postgres:
+    image: postgres:18
+    container_name: room_postgres
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    env_file:
+      - ./backend/.env
+    environment:
+      POSTGRES_PORT: ${DB_PORT}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    command: ['postgres', '-c', 'port=${DB_PORT}']
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -p $$POSTGRES_PORT || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    container_name: room_redis
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    volumes:
+      - redis-data:/data
+    command: redis-server --port ${REDIS_PORT}
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-p', '${REDIS_PORT}', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: room_frontend
+    ports:
+      - '${PORT}:${PORT}'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - ./frontend/.env
+    environment:
+      - NODE_ENV=development
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis-data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -11,7 +11,7 @@ export const initializeSocketServer = (
 
   const io = new Server(server, {
     cors: {
-      origin: [process.env.CORS_ORIGINS || 'http://localhost:3003'],
+      origin: [process.env.CORS_ORIGINS || 'http://localhost:8003'],
       methods: ['GET', 'POST'],
       credentials: true,
     },
