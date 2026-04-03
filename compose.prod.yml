@@ -18,6 +18,11 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
 
   postgres:
     image: postgres:18
@@ -81,9 +86,79 @@ services:
       - backend
     restart: unless-stopped
 
+  loki:
+    image: grafana/loki:latest
+    container_name: room_loki
+    ports:
+      - '${LOKI_PORT}:${LOKI_PORT}'
+    mem_limit: 2g
+    cpus: 1
+    volumes:
+      - loki_data:/loki
+      - loki_memberlist:/loki/memberlist
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: room_prometheus
+    ports:
+      - '${PROMETHEUS_PORT}:${PROMETHEUS_PORT}'
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=24h'
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: room_grafana
+    ports:
+      - '${GRAFANA_PORT}:${GRAFANA_PORT}'
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+    networks:
+      - app-network
+    depends_on:
+      - prometheus
+      - loki
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: room_promtail
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./backend/logs:/app/logs:ro
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - app-network
+    depends_on:
+      - loki
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:
+  loki_data:
+  loki_memberlist:
+  prometheus_data:
+  grafana_data:
 
 networks:
   app-network:
