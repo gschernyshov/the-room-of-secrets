@@ -57,3 +57,12 @@ compactor:
 
 frontend:
   log_queries_longer_than: 10s
+
+ruler:
+  alertmanager_url: ''
+  enable_api: false
+  enable_alertmanager_v2: false
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
