@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { register } from 'prom-client'
-import { getMetrics } from '../monitoring/metrics.js'
+import { getMetrics } from '../infrastructure/monitoring/metrics.js'
 
 const router = Router()
 
-router.get('/metrics', async (req, res) => {
+router.get('/metrics', async (_, res) => {
   try {
     res.set('Content-Type', register.contentType)
     const metrics = await getMetrics()

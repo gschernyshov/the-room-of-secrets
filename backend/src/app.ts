@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser'
 import metricsRoutes from './routes/metrics.rout.js'
 import authRoutes from './routes/auth.routes.js'
 import userRoutes from './routes/user.routes.js'
-import { registerMetrics } from './monitoring/metrics.js'
+import { registerMetrics } from './infrastructure/monitoring/metrics.js'
 
 export const app = express()
 

@@ -42,13 +42,17 @@ class Logger {
   }
 
   private writeLog(level: LogLevelStrings, message: string) {
-    const timestamp = new Date().toLocaleString()
-    const logEntry = `[${timestamp}] ${level}: ${message}\n`
+    const logEntry = {
+      ts: new Date().toISOString(),
+      level,
+      msg: message,
+    }
+    const jsonLine = JSON.stringify(logEntry) + '\n'
 
-    appendFile(this.logFile, logEntry, 'utf-8', _ => {})
+    appendFile(this.logFile, jsonLine, 'utf-8', _ => {})
 
     if (level === LogLevel.ERROR) {
-      appendFile(this.logErrorsFile, logEntry, 'utf-8', _ => {})
+      appendFile(this.logErrorsFile, jsonLine, 'utf-8', _ => {})
     }
   }
 

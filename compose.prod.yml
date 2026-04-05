@@ -4,8 +4,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
     container_name: room_backend
+    labels:
+      app.room: 'true'
     ports:
       - '${BACKEND_PORT}:${BACKEND_PORT}'
+    volumes:
+      - ./backend/logs:/app/logs
     env_file:
       - ./backend/.env
     environment:
@@ -27,6 +31,8 @@ services:
   postgres:
     image: postgres:18
     container_name: room_postgres
+    labels:
+      app.room: 'true'
     ports:
       - '${DB_PORT}:${DB_PORT}'
     volumes:
@@ -55,6 +61,8 @@ services:
   redis:
     image: redis:alpine
     container_name: room_redis
+    labels:
+      app.room: 'true'
     ports:
       - '${REDIS_PORT}:${REDIS_PORT}'
     volumes:
@@ -74,6 +82,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
     container_name: room_frontend
+    labels:
+      app.room: 'true'
     ports:
       - '${FRONTEND_PORT}:${FRONTEND_PORT}'
     env_file:
@@ -89,6 +99,8 @@ services:
   loki:
     image: grafana/loki:latest
     container_name: room_loki
+    labels:
+      app.room: 'true'
     ports:
       - '${LOKI_PORT}:${LOKI_PORT}'
     mem_limit: 2g
@@ -96,8 +108,8 @@ services:
     volumes:
       - loki_data:/loki
       - loki_memberlist:/loki/memberlist
-      - ./loki-config.yaml:/etc/loki/local-config.yaml
-    command: -config.file=/etc/loki/local-config.yaml
+      - ./loki-config.yml:/etc/loki/local-config.yml
+    command: -config.file=/etc/loki/local-config.yml
     networks:
       - app-network
     restart: unless-stopped
@@ -105,6 +117,8 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: room_prometheus
+    labels:
+      app.room: 'true'
     ports:
       - '${PROMETHEUS_PORT}:${PROMETHEUS_PORT}'
     volumes:
@@ -121,6 +135,8 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: room_grafana
+    labels:
+      app.room: 'true'
     ports:
       - '${GRAFANA_PORT}:${GRAFANA_PORT}'
     environment:
@@ -140,12 +156,15 @@ services:
   promtail:
     image: grafana/promtail:latest
     container_name: room_promtail
+    labels:
+      app.room: 'true'
     volumes:
       - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./backend/logs:/app/logs:ro
-      - ./promtail-config.yaml:/etc/promtail/config.yaml
-    command: -config.file=/etc/promtail/config.yaml
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
     networks:
       - app-network
     depends_on:
