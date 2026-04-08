@@ -9,6 +9,12 @@ let failedQueue: Array<{
   resolve: () => void
 }> = []
 
+let onTokenRefreshed: ((token: string) => void) | null = null
+
+export const setOnTokenRefreshed = (callback: (token: string) => void) => {
+  onTokenRefreshed = callback
+}
+
 const processQueue = (error: AppError | null) => {
   failedQueue.forEach(promise => {
     if (error) {
@@ -108,7 +114,9 @@ export const apiFetch = async (
       if (refreshResult.success) {
         const { newAccessToken } = refreshResult.data
 
-        localStorage.setItem('accessToken', newAccessToken)
+        if (onTokenRefreshed) {
+          onTokenRefreshed(newAccessToken)
+        }
 
         const retryHeaders = new Headers(init?.headers)
         retryHeaders.set('Authorization', `Bearer ${newAccessToken}`)
