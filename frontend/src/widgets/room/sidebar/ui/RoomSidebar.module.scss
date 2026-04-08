@@ -1,0 +1,21 @@
+.room-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid rgb(222, 222, 222);
+  border-radius: 23px;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  &__list {
+    list-style: none;
+  }
+
+  &__item {
+    font-size: 14px;
+  }
+}
