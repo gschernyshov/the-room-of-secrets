@@ -1,0 +1,36 @@
+.room-container {
+  display: flex;
+  gap: 20px;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+
+  &__chat-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    width: 75%;
+    margin-left: 56px;
+    padding-left: 20px;
+
+    &__header {
+      flex: 1;
+    }
+
+    &__messages {
+      flex: 8;
+
+      overflow-y: hidden;
+    }
+
+    &__input {
+      flex: 1;
+    }
+  }
+
+  &__sidebar {
+    margin-top: calc(10vh + 16px);
+    width: 25%;
+  }
+}

@@ -8,5 +8,5 @@ export const AppRoutes = {
 } as const
 
 export const RoutePath = {
-  [AppRoutes.ROOM]: '/room/:id',
+  [AppRoutes.ROOM]: '/room/:roomId',
 } as const
