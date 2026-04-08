@@ -1,0 +1,14 @@
+.room-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  gap: 5px;
+  height: 100%;
+
+  &__title {
+  }
+
+  &__id {
+    color: rgb(175, 175, 175);
+  }
+}
