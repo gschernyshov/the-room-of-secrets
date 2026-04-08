@@ -19,7 +19,7 @@ class MessageRepository {
   async get(roomId: Room['id']): Promise<Message[]> {
     const messages = await db.query<Message>(
       `
-        SELECT id, room_id AS roomId, sender_id AS senderId, content, timestamp
+        SELECT id, room_id AS "roomId", sender_id AS "senderId", content, timestamp
         FROM messages
         WHERE room_id = $1
         ORDER BY timestamp ASC

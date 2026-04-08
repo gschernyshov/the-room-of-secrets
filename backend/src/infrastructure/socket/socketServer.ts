@@ -22,12 +22,7 @@ export const initializeSocketServer = (
   })
 
   io.use((socket, next) => {
-    const authHeader = socket.handshake.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return next(new Error('Требуется аутентификация'))
-    }
-
-    const token = authHeader.split(' ')[1]
+    const token = socket.handshake.auth?.token
     if (!token) {
       return next(new Error('Требуется аутентификация'))
     }

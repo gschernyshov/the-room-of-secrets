@@ -11,7 +11,7 @@ class RoomRepository {
       `
         INSERT INTO rooms (name, participants)
         VALUES ($1, $2)
-        RETURNING id, name, participants, created_at AS createdAt
+        RETURNING id, name, participants, created_at AS "createdAt"
         `,
       [name, [creatorId]]
     )
@@ -21,7 +21,7 @@ class RoomRepository {
 
   async findById(roomId: Room['id']): Promise<Room | null> {
     const [room] = await db.query<Room>(
-      'SELECT id, name, participants, created_at AS createdAt FROM rooms WHERE id = $1',
+      'SELECT id, name, participants, created_at AS "createdAt" FROM rooms WHERE id = $1',
       [roomId]
     )
 

@@ -24,8 +24,6 @@ export const roomHandler = (socket: Socket, userId: User['id']) => {
 
         const room = await roomService.create(name, userId)
 
-        await socket.join(room.id)
-
         return callback?.({ success: true, data: room })
       } catch (error) {
         return callback?.({ success: false, error: { message: error.message } })

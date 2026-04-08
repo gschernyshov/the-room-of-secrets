@@ -38,7 +38,7 @@ export const messageHandler = (socket: Socket, userId: User['id']) => {
 
         const message = await messageService.send(roomId, userId, content)
 
-        socket.to(roomId).emit('new_message', message)
+        socket.nsp.to(roomId).emit('new_message', message)
 
         return callback?.({ success: true })
       } catch (error) {
