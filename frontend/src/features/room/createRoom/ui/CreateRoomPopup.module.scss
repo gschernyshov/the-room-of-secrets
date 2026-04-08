@@ -1,0 +1,14 @@
+.create-room-popup {
+  &__trigger {
+    display: flex;
+    width: 100%;
+  }
+
+  &__popup {
+    margin-left: 10px;
+
+    --g-popup-background-color: rgba(0, 0, 0, 0);
+    --g-popup-border-width: 0;
+    --g-popup-border-radius: 23px;
+  }
+}

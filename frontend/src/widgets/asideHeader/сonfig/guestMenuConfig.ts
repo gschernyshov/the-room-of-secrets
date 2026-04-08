@@ -1,13 +1,15 @@
 import { ArrowRightToSquare, PersonPlus } from '@gravity-ui/icons'
 import { type AsideHeaderItem } from '@gravity-ui/navigation'
 
+type AuthActions = {
+  onLogin: () => void
+  onRegister: () => void
+}
+
 export const buildGuestMenuItems = ({
   onLogin,
   onRegister,
-}: {
-  onLogin: () => void
-  onRegister: () => void
-}): AsideHeaderItem[] => [
+}: AuthActions): AsideHeaderItem[] => [
   {
     id: 'login',
     type: 'action',
