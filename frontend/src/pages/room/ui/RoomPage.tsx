@@ -56,22 +56,22 @@ export const RoomPage = () => {
   }
 
   return (
-    <div className={styles['room-container']}>
-      <div className={styles['room-container__chat-area']}>
-        <div className={styles['room-container__chat-area__header']}>
+    <div className={styles['room-page']}>
+      <div className={styles['room-page__chat-area']}>
+        <div className={styles['room-page__chat-header']}>
           <RoomInfo />
         </div>
 
-        <div className={styles['room-container__chat-area__messages']}>
+        <div className={styles['room-page__chat-messages']}>
           <MessageList />
         </div>
 
-        <div className={styles['room-container__chat-area__input']}>
+        <div className={styles['room-page__chat-input']}>
           <SendMessageForm />
         </div>
       </div>
 
-      <div className={styles['room-container__sidebar']}>
+      <div className={styles['room-page__sidebar']}>
         <RoomSidebar />
       </div>
     </div>
