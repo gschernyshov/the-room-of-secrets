@@ -9,6 +9,8 @@ import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors
 import styles from './LoginForm.module.scss'
 
 export const LoginForm = () => {
+  const { handleLogin } = useLogin()
+  const { successAlert } = useShowAlert()
   const {
     register,
     handleSubmit,
@@ -20,8 +22,6 @@ export const LoginForm = () => {
       ...initLoginFormData,
     },
   })
-  const { handleLogin } = useLogin()
-  const { successAlert } = useShowAlert()
   const handleErrors = createHandleFormErrors<LoginFormData>(
     fieldNames,
     setError
@@ -39,15 +39,20 @@ export const LoginForm = () => {
   }
 
   return (
-    <div className={styles['container']}>
-      <form onSubmit={handleSubmit(onSubmit)} className={styles['form']}>
-        <h2 className={styles['form__title']}>Вход</h2>
+    <div className={styles['login-form']}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className={styles['login-form__container']}
+      >
+        <h2 className={styles['login-form__title']}>Вход</h2>
 
         {errors.root && (
-          <div className={styles['form__error']}>{errors.root?.message}</div>
+          <div className={styles['login-form__error']}>
+            {errors.root?.message}
+          </div>
         )}
 
-        <div className={styles['form__field']}>
+        <div className={styles['login-form__field']}>
           <label>Email</label>
           <TextInput
             size="xl"
@@ -57,14 +62,11 @@ export const LoginForm = () => {
             validationState={errors.email ? 'invalid' : undefined}
             errorMessage={errors.email?.message}
             {...register('email')}
-            style={{
-              '--g-text-input-border-color': 'white',
-              '--g-text-input-border-radius': '100px',
-            }}
+            className={styles['login-form__input']}
           />
         </div>
 
-        <div className={styles['form__field']}>
+        <div className={styles['login-form__field']}>
           <label>Пароль</label>
           <PasswordInput
             size="xl"
@@ -74,10 +76,7 @@ export const LoginForm = () => {
             validationState={errors.password ? 'invalid' : undefined}
             errorMessage={errors.password?.message}
             {...register('password')}
-            style={{
-              '--g-text-input-border-color': 'white',
-              '--g-text-input-border-radius': '100px',
-            }}
+            className={styles['login-form__input']}
           />
         </div>
 
@@ -88,7 +87,7 @@ export const LoginForm = () => {
           pin="circle-circle"
           disabled={isSubmitting}
           loading={isSubmitting}
-          style={{ '--g-button-background-color': 'rgb(222, 222, 222)' }}
+          className={styles['login-form__button']}
         >
           {isSubmitting ? 'Вход...' : 'Войти'}
         </Button>

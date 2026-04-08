@@ -11,21 +11,18 @@ type Props = {
 export const Footer = ({ compact, handleProfile }: Props) => {
   const { status, user } = useSessionStore()
 
-  if (status !== 'authenticated' || !user) return null
+  if (status !== 'authenticated') return null
 
-  console.log(user.username)
   return (
     <div className={styles['footer']}>
       <div className={styles['footer__profile']} onClick={handleProfile}>
         <Avatar text={user?.username ?? 'Аватар'} size={compact ? 'm' : 'xl'} />
         {!compact && (
-          <div className={styles['footer__profile-info']}>
-            <span className={styles['footer__profile-username']}>
+          <div className={styles['footer__info']}>
+            <span className={styles['footer__username']}>
               @{user?.username}
             </span>
-            <span className={styles['footer__profile-email']}>
-              {user?.email}
-            </span>
+            <span className={styles['footeк__email']}>{user?.email}</span>
           </div>
         )}
       </div>

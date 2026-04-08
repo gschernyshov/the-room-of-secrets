@@ -25,8 +25,6 @@ export const useLogin = () => {
       if (result.success) {
         const { accessToken, user } = result.data
 
-        console.log(user)
-
         useSessionStore.getState().login(accessToken, user)
 
         const from = state?.from?.pathname || AppRoutes.HOME

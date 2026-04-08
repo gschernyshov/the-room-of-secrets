@@ -9,6 +9,8 @@ import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors
 import styles from './RegisterForm.module.scss'
 
 export const RegisterForm = () => {
+  const { handleRegister } = useRegister()
+  const { successAlert } = useShowAlert()
   const {
     register,
     handleSubmit,
@@ -20,8 +22,6 @@ export const RegisterForm = () => {
       ...initRegisterData,
     },
   })
-  const { handleRegister } = useRegister()
-  const { successAlert } = useShowAlert()
   const handleErrors = createHandleFormErrors<RegisterFormData>(
     fieldNames,
     setError
@@ -42,15 +42,20 @@ export const RegisterForm = () => {
   }
 
   return (
-    <div className={styles['container']}>
-      <form onSubmit={handleSubmit(onSubmit)} className={styles['form']}>
-        <h2 className={styles['form__title']}>Регистрация</h2>
+    <div className={styles['login-form']}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className={styles['login-form__container']}
+      >
+        <h2 className={styles['login-form__title']}>Регистрация</h2>
 
         {errors.root && (
-          <div className={styles['form__error']}>{errors.root?.message}</div>
+          <div className={styles['login-form__error']}>
+            {errors.root?.message}
+          </div>
         )}
 
-        <div className={styles['form__field']}>
+        <div className={styles['login-form__field']}>
           <label>Username</label>
           <TextInput
             size="xl"
@@ -60,14 +65,11 @@ export const RegisterForm = () => {
             validationState={errors.username ? 'invalid' : undefined}
             errorMessage={errors.username?.message}
             {...register('username')}
-            style={{
-              '--g-text-input-border-color': 'white',
-              '--g-text-input-border-radius': '100px',
-            }}
+            className={styles['login-form__input']}
           />
         </div>
 
-        <div className={styles['form__field']}>
+        <div className={styles['login-form__field']}>
           <label>Email</label>
           <TextInput
             size="xl"
@@ -77,14 +79,11 @@ export const RegisterForm = () => {
             validationState={errors.email ? 'invalid' : undefined}
             errorMessage={errors.email?.message}
             {...register('email')}
-            style={{
-              '--g-text-input-border-color': 'white',
-              '--g-text-input-border-radius': '100px',
-            }}
+            className={styles['login-form__input']}
           />
         </div>
 
-        <div className={styles['form__field']}>
+        <div className={styles['login-form__field']}>
           <label>Пароль</label>
           <PasswordInput
             size="xl"
@@ -94,10 +93,7 @@ export const RegisterForm = () => {
             validationState={errors.password ? 'invalid' : undefined}
             errorMessage={errors.password?.message}
             {...register('password')}
-            style={{
-              '--g-text-input-border-color': 'white',
-              '--g-text-input-border-radius': '100px',
-            }}
+            className={styles['login-form__input']}
           />
         </div>
 
@@ -108,7 +104,7 @@ export const RegisterForm = () => {
           pin="circle-circle"
           disabled={isSubmitting}
           loading={isSubmitting}
-          style={{ '--g-button-background-color': 'rgb(222, 222, 222)' }}
+          className={styles['login-form__button']}
         >
           {isSubmitting ? 'Регистрация...' : 'Регистрация'}
         </Button>

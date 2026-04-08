@@ -10,21 +10,20 @@
     justify-content: center;
     align-items: center;
     gap: 10px;
-
     cursor: pointer;
   }
 
-  &__profile-info {
+  &__info {
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
 
-  &__profile-name {
+  &__name {
     font-size: 16px;
   }
 
-  &__profile-email {
+  &__email {
     font-size: 14px;
     color: gray;
   }

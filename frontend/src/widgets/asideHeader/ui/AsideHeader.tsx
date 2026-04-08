@@ -54,7 +54,7 @@ export const AsideHeader = () => {
     ...item,
     className: clsx(
       styles['aside-header__item'],
-      pathname === ID_TO_ROUTE[item.id] && styles['aside-header__item_active']
+      pathname === ID_TO_ROUTE[item.id] && styles['aside-header__item--active']
     ),
   }))
 

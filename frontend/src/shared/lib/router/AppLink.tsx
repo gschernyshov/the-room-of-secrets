@@ -6,7 +6,7 @@ export const AppLink = ({ children, ...props }: NavLinkProps) => {
   return (
     <NavLink
       className={({ isActive }) =>
-        clsx(styles['app-link'], isActive && styles['app-link_active'])
+        clsx(styles['app-link'], isActive && styles['app-link--active'])
       }
       {...props}
     >

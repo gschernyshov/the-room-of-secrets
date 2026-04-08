@@ -32,7 +32,7 @@ export const LogoutButton = ({ compact }: Props) => {
       disabled={isLoading}
       loading={isLoading}
       onClick={onLogout}
-      className={styles['logout']}
+      className={styles['logout-button']}
     >
       {compact && <Icon data={ArrowRightFromSquare} size={18} />}
       <Icon data={ArrowRightFromSquare} size={18} />
