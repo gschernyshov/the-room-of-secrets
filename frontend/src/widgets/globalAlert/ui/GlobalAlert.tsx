@@ -8,7 +8,7 @@ export const GlobalAlert = () => {
   if (!open) return null
 
   return (
-    <div className={styles['container']}>
+    <div className={styles['container-global-alert']}>
       <Alert
         theme={type}
         title={title}
