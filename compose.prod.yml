@@ -81,11 +81,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_SOCKET_URL: ${VITE_SOCKET_URL}
     container_name: room_frontend
     labels:
       app.room: 'true'
     ports:
-      - '${FRONTEND_PORT}:${FRONTEND_PORT}'
+      - '${FRONTEND_PORT}:80'
     env_file:
       - ./frontend/.env
     environment:

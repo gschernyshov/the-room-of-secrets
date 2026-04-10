@@ -2,9 +2,7 @@
 node_modules/
 
 # === Environment ===
-# .env
-# не игнорируем .env, потому что он нужен на этапе сборки (vite build),
-# используется в Dockerfile.prod: COPY . . для подстановки VITE_* переменных
+.env
 .env.example
 
 # === Build artifacts ===
