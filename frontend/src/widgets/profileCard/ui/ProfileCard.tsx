@@ -3,6 +3,7 @@ import { Avatar } from '@gravity-ui/uikit'
 import { TABS } from '../model/tab'
 import { useProfileCardStore } from '../model/profileCardStore'
 import { useInitProfileStore } from '../lib/useInitProfileStore'
+import { ChangeInfo } from '@/features/user/changeInfo'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import styles from './ProfileCard.module.scss'
 
@@ -41,7 +42,7 @@ export const ProfileCard = () => {
       </div>
 
       <div className={styles['profile-card__content']}>
-        {activeTab === 'profile' && <p>Данные</p>}
+        {activeTab === 'profile' && <ChangeInfo />}
         {activeTab === 'password' && <p>Пароль</p>}
         {activeTab === 'rooms' && <p>Комнаты</p>}
       </div>
