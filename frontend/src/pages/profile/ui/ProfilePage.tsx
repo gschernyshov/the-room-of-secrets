@@ -1,7 +1,5 @@
-import { useSessionStore } from '@/entities/session/model/sessionStore'
+import { ProfileCard } from '@/widgets/profileCard'
 
 export const ProfilePage = () => {
-  const user = useSessionStore(state => state.user)
-
-  return <div>{user && <p>{JSON.stringify(user)}</p>}</div>
+  return <ProfileCard />
 }

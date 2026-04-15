@@ -2,9 +2,6 @@
   display: flex;
   gap: 20px;
   height: 100vh;
-  width: 100vw;
-  padding-left: 56px;
-  padding-right: 20px;
   overflow: hidden;
 
   &__chat-area {
@@ -12,7 +9,6 @@
     flex-direction: column;
     gap: 20px;
     width: 75%;
-    padding-left: 20px;
   }
 
   &__chat-header {
