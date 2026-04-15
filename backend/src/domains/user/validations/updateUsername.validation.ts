@@ -1,7 +1,7 @@
 import { body } from 'express-validator'
 
 export const validateUpdateUsername = [
-  body('newUsername')
+  body('username')
     .exists()
     .withMessage('Username обязателен')
     .bail()

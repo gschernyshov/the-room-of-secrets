@@ -1,7 +1,7 @@
 import { body } from 'express-validator'
 
 export const validateUpdateEmail = [
-  body('newEmail')
+  body('email')
     .exists()
     .withMessage('Email обязателен')
     .bail()

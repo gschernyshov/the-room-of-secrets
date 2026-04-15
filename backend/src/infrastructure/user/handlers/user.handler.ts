@@ -21,10 +21,10 @@ export const userHandler = {
 
   updateUsername: async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user.id
-    const { newUsername } = req.body
+    const { username } = req.body
 
     try {
-      await userService.updateUsername(userId, newUsername)
+      await userService.updateUsername(userId, username)
 
       res.status(200).json({
         success: true,
@@ -38,10 +38,10 @@ export const userHandler = {
 
   updateEmail: async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user.id
-    const { newEmail } = req.body
+    const { email } = req.body
 
     try {
-      await userService.updateEmail(userId, newEmail)
+      await userService.updateEmail(userId, email)
 
       res.status(200).json({
         success: true,
@@ -55,10 +55,10 @@ export const userHandler = {
 
   updatePassword: async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user.id
-    const { newPassword } = req.body
+    const { password } = req.body
 
     try {
-      await userService.updatePassword(userId, newPassword)
+      await userService.updatePassword(userId, password)
 
       res.status(200).json({
         success: true,

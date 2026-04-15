@@ -1,7 +1,7 @@
 import { body } from 'express-validator'
 
 export const validateUpdatePassword = [
-  body('newPassword')
+  body('password')
     .exists()
     .withMessage('Пароль обязателен')
     .bail()
