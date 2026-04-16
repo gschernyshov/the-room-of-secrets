@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, Button } from '@gravity-ui/uikit'
@@ -43,6 +43,12 @@ export const Field = ({ nameField }: Props) => {
   )
   const form = useRef<HTMLFormElement>(null)
   const [isEdit, setIsEdit] = useState(false)
+
+  useEffect(() => {
+    if (errors.root) {
+      errorAlert('Обновление данных пользоваетля', errors.root.message)
+    }
+  }, [errors.root])
 
   useOnClickOutside(form, () => {
     if (isEdit) {
