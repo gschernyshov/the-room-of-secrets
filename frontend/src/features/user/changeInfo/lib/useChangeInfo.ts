@@ -36,9 +36,9 @@ export const useChangeInfo = () => {
         )
       }
     } catch (error) {
-      if (error instanceof AppError) throw error
-
       updateUser({ [nameField]: currentValue })
+
+      if (error instanceof AppError) throw error
 
       throw new AppError(
         `При обновлении ${nameField} возникла непредвиденная ошибка`
