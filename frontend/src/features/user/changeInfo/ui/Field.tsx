@@ -23,12 +23,14 @@ type Props = {
 export const Field = ({ nameField }: Props) => {
   const user = useSessionStore(state => state.user)
   const { handleChangeInfo } = useChangeInfo()
-  const { successAlert } = useShowAlert()
+  const { successAlert, errorAlert } = useShowAlert()
   const {
     register,
-    handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
+    handleSubmit,
     setError,
+    clearErrors,
   } = useForm({
     resolver: zodResolver(changeInfoSchema),
     defaultValues: getInitialFormData(user, nameField),
@@ -39,15 +41,43 @@ export const Field = ({ nameField }: Props) => {
     fieldNames,
     setError
   )
-  const field = useRef<HTMLDivElement>(null)
+  const form = useRef<HTMLFormElement>(null)
   const [isEdit, setIsEdit] = useState(false)
 
-  useOnClickOutside(field, () => setIsEdit(false))
+  useOnClickOutside(form, () => {
+    if (isEdit) {
+      if (isSubmitting) return
+
+      setTimeout(() => {
+        setValue(nameField, user?.[nameField])
+        clearErrors(nameField)
+        errorAlert(
+          'Обновление данных пользоваетля',
+          `Вы не сохранили ${nameField}`
+        )
+        setIsEdit(false)
+      }, 0)
+    }
+  })
+
+  const handleClick = () => {
+    if (!isEdit) {
+      setIsEdit(true)
+      return
+    }
+
+    const formElement = form.current
+    if (formElement) {
+      const submitEvent = new Event('submit', {
+        bubbles: true,
+        cancelable: true,
+      })
+      formElement.dispatchEvent(submitEvent)
+    }
+  }
 
   const onSubmit = async (data: ChangeInfoFormData) => {
-    if (!isEdit) setIsEdit(true)
-
-    if (!isEdit || isSubmitting) return
+    if (isSubmitting) return
 
     try {
       await handleChangeInfo(nameField, data)
@@ -63,17 +93,19 @@ export const Field = ({ nameField }: Props) => {
 
   return (
     <form
+      ref={form}
       onSubmit={handleSubmit(onSubmit)}
       className={styles['change-info-form']}
     >
       <label htmlFor={nameField} className={styles['change-info-form__label']}>
         {nameField}
       </label>
-      <div ref={field} className={styles['change-info-form__field']}>
+      <div className={styles['change-info-form__field']}>
         <TextInput
           id={nameField}
           size="xl"
           pin={isEdit ? 'round-round' : 'round-clear'}
+          autoFocus={false}
           disabled={!isEdit || isSubmitting}
           placeholder={`Введите ${nameField}`}
           validationState={errors[nameField] ? 'invalid' : undefined}
@@ -86,11 +118,12 @@ export const Field = ({ nameField }: Props) => {
         />
         <Button
           view="action"
-          type="submit"
+          type="button"
           size="xl"
           pin={isEdit ? 'circle-circle' : 'clear-circle'}
           disabled={isSubmitting}
           loading={isSubmitting}
+          onClick={handleClick}
           className={clsx(
             styles['change-info-form__button'],
             !isEdit && styles['change-info-form__button--not-active']

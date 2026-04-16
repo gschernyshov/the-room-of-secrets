@@ -16,12 +16,12 @@ import styles from './ChangePassword.module.scss'
 
 export const ChangePassword = () => {
   const { handleChangePassword } = useChangePassword()
-  const { successAlert } = useShowAlert()
+  const { successAlert, errorAlert } = useShowAlert()
   const {
     register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
     setValue,
+    formState: { errors, isSubmitting },
+    handleSubmit,
     setError,
     clearErrors,
   } = useForm({
@@ -38,11 +38,15 @@ export const ChangePassword = () => {
   const [isEdit, setIsEdit] = useState(false)
 
   useOnClickOutside(form, () => {
-    setTimeout(() => {
-      setValue('password', '')
-      clearErrors('password')
-      setIsEdit(false)
-    }, 0)
+    if (isEdit) {
+      if (isSubmitting) return
+      setTimeout(() => {
+        setValue('password', '')
+        clearErrors('password')
+        setIsEdit(false)
+        errorAlert('Обновление данных пользоваетля', 'Вы не сохранили пароль')
+      }, 0)
+    }
   })
 
   const handleClick = () => {

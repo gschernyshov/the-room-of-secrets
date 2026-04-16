@@ -31,7 +31,7 @@ export const useChangeInfo = () => {
         return
       } else {
         throw new AppError(
-          'При обновлении данных возникла непредвиденная ошибка',
+          `При обновлении ${nameField} возникла непредвиденная ошибка`,
           result.error.message
         )
       }
@@ -40,7 +40,9 @@ export const useChangeInfo = () => {
 
       updateUser({ [nameField]: currentValue })
 
-      throw new AppError('При обновлении данных возникла непредвиденная ошибка')
+      throw new AppError(
+        `При обновлении ${nameField} возникла непредвиденная ошибка`
+      )
     }
   }
 

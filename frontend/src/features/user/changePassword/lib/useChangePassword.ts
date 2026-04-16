@@ -25,7 +25,7 @@ export const useChangePassword = () => {
     } catch (error) {
       if (error instanceof AppError) throw error
 
-      throw new AppError('При обновлении данных возникла непредвиденная ошибка')
+      throw new AppError('При обновлении пароля возникла непредвиденная ошибка')
     }
   }
 
