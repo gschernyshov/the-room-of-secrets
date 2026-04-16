@@ -1,8 +1,10 @@
 import clsx from 'clsx'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { TextInput, Button } from '@gravity-ui/uikit'
+import { TextInput, Button, Tooltip, ClipboardButton } from '@gravity-ui/uikit'
+import { Paintbrush } from '@gravity-ui/icons'
+import { generatePassword } from '../lib/generatePassword'
 import { useChangePassword } from '../lib/useChangePassword'
 import {
   changePasswordSchema,
@@ -36,6 +38,7 @@ export const ChangePassword = () => {
   )
   const form = useRef<HTMLFormElement>(null)
   const [isEdit, setIsEdit] = useState(false)
+  const [generatedPassword, setGeneratedPassword] = useState('')
 
   useEffect(() => {
     if (errors.root) {
@@ -50,11 +53,19 @@ export const ChangePassword = () => {
       setValue('password', '')
       clearErrors('password')
 
+      setGeneratedPassword('')
+
       errorAlert('Обновление данных пользоваетля', 'Вы не сохранили пароль')
 
       setIsEdit(false)
     }, 0)
   })
+
+  const handleGeneratePassword = () => {
+    const password = generatePassword()
+    setGeneratedPassword(password)
+    setValue('password', password)
+  }
 
   const handleClick = () => {
     if (!isEdit) {
@@ -81,6 +92,8 @@ export const ChangePassword = () => {
         'Обновление данных пользователя',
         `Вы успешно обновили пароль`
       )
+      setValue('password', '')
+      setGeneratedPassword('')
       setIsEdit(false)
     } catch (error) {
       handleErrors(error)
@@ -115,6 +128,35 @@ export const ChangePassword = () => {
             !isEdit && styles['change-password-form__input--not-active']
           )}
         />
+
+        {isEdit && (
+          <Tooltip
+            content="Автогенерация пароля"
+            placement="top"
+            openDelay={100}
+          >
+            <div
+              onClick={() => handleGeneratePassword()}
+              className={styles['change-password-form__generate-button']}
+            >
+              <Paintbrush
+                className={styles['change-password-form__generate-button-icon']}
+              />
+            </div>
+          </Tooltip>
+        )}
+
+        {isEdit && generatedPassword && (
+          <div className={styles['change-password-form__clipboard-button']}>
+            <ClipboardButton
+              text={generatedPassword}
+              tooltipInitialText="Скопировать пароль"
+              tooltipSuccessText="Пароль скопирован"
+              className={styles['change-password-form__clipboard-button-icon']}
+            />
+          </div>
+        )}
+
         <Button
           view="action"
           type="button"

@@ -49,7 +49,7 @@ export const Field = ({ nameField }: Props) => {
 
   useEffect(() => {
     if (errors.root) {
-      errorAlert('Обновление данных пользоваетля', errors.root.message)
+      errorAlert('Обновление данных пользователя', errors.root.message)
     }
   }, [errors.root])
 
@@ -62,7 +62,7 @@ export const Field = ({ nameField }: Props) => {
 
       if (user?.[nameField] !== currentValue) {
         errorAlert(
-          'Обновление данных пользоваетля',
+          'Обновление данных пользователя',
           `Вы не сохранили ${nameField}`
         )
       }
@@ -93,7 +93,7 @@ export const Field = ({ nameField }: Props) => {
     try {
       await handleChangeInfo(nameField, data)
       successAlert(
-        'Обновление данных пользоваетля',
+        'Обновление данных пользователя',
         `Вы успешно обновили ${nameField}`
       )
       setIsEdit(false)
