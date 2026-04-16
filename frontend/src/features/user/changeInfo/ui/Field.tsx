@@ -109,7 +109,7 @@ export const Field = ({ nameField }: Props) => {
       className={styles['change-info-form']}
     >
       <label htmlFor={nameField} className={styles['change-info-form__label']}>
-        {nameField}
+        {nameField.charAt(0).toUpperCase() + nameField.slice(1)}
       </label>
       <div className={styles['change-info-form__field']}>
         <TextInput
