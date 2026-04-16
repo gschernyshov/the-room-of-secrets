@@ -42,7 +42,7 @@ export const ChangePassword = () => {
 
   useEffect(() => {
     if (errors.root) {
-      errorAlert('Обновление данных пользоваетля', errors.root.message)
+      errorAlert('Обновление данных пользователя', errors.root.message)
     }
   }, [errors.root])
 
@@ -55,7 +55,7 @@ export const ChangePassword = () => {
 
       setGeneratedPassword('')
 
-      errorAlert('Обновление данных пользоваетля', 'Вы не сохранили пароль')
+      errorAlert('Обновление данных пользователя', 'Вы не сохранили пароль')
 
       setIsEdit(false)
     }, 0)
@@ -136,7 +136,7 @@ export const ChangePassword = () => {
             openDelay={100}
           >
             <div
-              onClick={() => handleGeneratePassword()}
+              onClick={handleGeneratePassword}
               className={styles['change-password-form__generate-button']}
             >
               <Paintbrush
