@@ -44,15 +44,16 @@ export const ChangePassword = () => {
   }, [errors.root])
 
   useOnClickOutside(form, () => {
-    if (isEdit) {
-      if (isSubmitting) return
-      setTimeout(() => {
-        setValue('password', '')
-        clearErrors('password')
-        setIsEdit(false)
-        errorAlert('Обновление данных пользоваетля', 'Вы не сохранили пароль')
-      }, 0)
-    }
+    if (!isEdit || isSubmitting) return
+
+    setTimeout(() => {
+      setValue('password', '')
+      clearErrors('password')
+
+      errorAlert('Обновление данных пользоваетля', 'Вы не сохранили пароль')
+
+      setIsEdit(false)
+    }, 0)
   })
 
   const handleClick = () => {

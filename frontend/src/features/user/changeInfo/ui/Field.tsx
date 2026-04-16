@@ -26,6 +26,7 @@ export const Field = ({ nameField }: Props) => {
   const { successAlert, errorAlert } = useShowAlert()
   const {
     register,
+    watch,
     setValue,
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -43,6 +44,8 @@ export const Field = ({ nameField }: Props) => {
   )
   const form = useRef<HTMLFormElement>(null)
   const [isEdit, setIsEdit] = useState(false)
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const currentValue = watch(nameField)
 
   useEffect(() => {
     if (errors.root) {
@@ -51,19 +54,21 @@ export const Field = ({ nameField }: Props) => {
   }, [errors.root])
 
   useOnClickOutside(form, () => {
-    if (isEdit) {
-      if (isSubmitting) return
+    if (!isEdit || isSubmitting) return
 
-      setTimeout(() => {
-        setValue(nameField, user?.[nameField])
-        clearErrors(nameField)
+    setTimeout(() => {
+      setValue(nameField, user?.[nameField])
+      clearErrors(nameField)
+
+      if (user?.[nameField] !== currentValue) {
         errorAlert(
           'Обновление данных пользоваетля',
           `Вы не сохранили ${nameField}`
         )
-        setIsEdit(false)
-      }, 0)
-    }
+      }
+
+      setIsEdit(false)
+    }, 0)
   })
 
   const handleClick = () => {
