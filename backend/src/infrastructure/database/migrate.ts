@@ -30,14 +30,18 @@ export const runMigrations = async () => {
         await db.query(sql)
         logger.success(`Миграция успешна: ${file}`)
       } catch (error) {
-        logger.error(`Ошибка в миграции ${file}: ${error.message}`)
+        logger.error(
+          `Ошибка в миграции ${file}${error instanceof Error ? `: ${error.message}` : ``}`
+        )
         throw error
       }
     }
 
     logger.success('Все миграции успешно выполнены')
   } catch (error) {
-    logger.error(`Критическая ошибка при выполнении миграций: ${error.message}`)
+    logger.error(
+      `Критическая ошибка при выполнении миграций${error instanceof Error ? `: ${error.message}` : ``}`
+    )
     throw error
   }
 }

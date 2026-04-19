@@ -1,4 +1,4 @@
-import { Pool, QueryResultRow, types } from 'pg'
+import { types, Pool, type QueryResultRow } from 'pg'
 import { logger } from '../../shared/utils/logger.js'
 
 export type QueryParam =
@@ -34,8 +34,9 @@ export const db = {
       await pool.query('SELECT NOW()')
       logger.success('Подключение к БД успешно выполнено')
     } catch (error) {
-      if (error instanceof Error)
-        logger.error(`Ошибка подключения к БД: ${error.message}`)
+      logger.error(
+        `Ошибка подключения к БД${error instanceof Error ? `: ${error.message}` : ''}`
+      )
       throw error
     }
   },
@@ -59,7 +60,9 @@ export const db = {
       const result = await pool.query<T>(text, params)
       return result.rows
     } catch (error) {
-      if (error instanceof Error) logger.error(`SQL Error: ${error.message}`)
+      logger.error(
+        `SQL Error${error instanceof Error ? `: ${error.message}` : ``}`
+      )
       throw error
     }
   },
