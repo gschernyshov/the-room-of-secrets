@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { authService } from '../../../domains/authentication/services/auth.service.js'
 import { parseTTL } from '../../../shared/utils/parseTTL.js'
+import { AppError } from '../../../shared/utils/errors.js'
 
 const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
 
@@ -37,9 +38,18 @@ export const authHandler = {
         data,
       })
     } catch (error) {
-      return res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
+        success: false,
+        error: {
+          message:
+            'При регистрации пользователя возникла непредвиденная ошибка',
+        },
+      })
     }
   },
 
@@ -56,9 +66,17 @@ export const authHandler = {
         data,
       })
     } catch (error) {
-      return res.status(error.statusCode).json({
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
         success: false,
-        error: { message: error.message, type: error.type },
+        error: {
+          message:
+            'При аутентификации пользователя возникла непредвиденная ошибка',
+        },
       })
     }
   },
@@ -74,9 +92,17 @@ export const authHandler = {
 
       return res.status(200).json({ success: true })
     } catch (error) {
-      return res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
+        success: false,
+        error: {
+          message: 'При выходе из системы возникла непредвиденная ошибка',
+        },
+      })
     }
   },
 
@@ -93,9 +119,18 @@ export const authHandler = {
 
       return res.status(200).json({ success: true, data: { newAccessToken } })
     } catch (error) {
-      return res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
+        success: false,
+        error: {
+          message:
+            'При выдаче access token и refresh token возникла непредвиденная ошибка',
+        },
+      })
     }
   },
 }
