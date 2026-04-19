@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { roomService } from '@/entities/room/lib/roomService'
+import { useRoomListStore } from '@/entities/room/model/roomListStore'
 import { type Room } from '@/entities/room/types'
-import { AppError } from '@/shared/utils/errors'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
+import { apiFetch } from '@/shared/api/apiFetch'
+import { AppError } from '@/shared/utils/errors'
 
 export const useCreateRoom = () => {
-  const { navigate } = useAppNavigate()
+  const { goToRoom } = useAppNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
   const createRoom = async (name: Room['name']) => {
@@ -13,13 +14,27 @@ export const useCreateRoom = () => {
 
     setIsLoading(true)
     try {
-      const room = await roomService.createRoom(name)
+      const response = await apiFetch('/room/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      })
 
-      navigate(`/room/${room.id}`)
+      const result = await response.json()
+
+      if (result.success) {
+        useRoomListStore.getState().addRoom(result.data)
+        goToRoom(result.data.id)
+      } else {
+        throw new AppError(
+          'При создании комнаты возникла непредвиденная ошибка',
+          result.error.message
+        )
+      }
     } catch (error) {
       if (error instanceof AppError) throw error
 
-      throw new AppError('При создании команты возникла непредвиденная ошибка')
+      throw new AppError('При создании комнаты возникла непредвиденная ошибка')
     } finally {
       setIsLoading(false)
     }
