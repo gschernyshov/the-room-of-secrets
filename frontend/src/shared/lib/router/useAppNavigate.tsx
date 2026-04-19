@@ -40,7 +40,7 @@ export const useAppNavigate = () => {
 
   const goToRoom = useCallback(
     (id: string, params?: NavigateOptions) => {
-      navigate(AppRoutes.ROOM.replace(':id', id), params)
+      navigate(`${AppRoutes.ROOM}/${id}`, params)
     },
     [navigate]
   )
