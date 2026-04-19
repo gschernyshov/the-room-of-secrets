@@ -5,6 +5,7 @@ import { useProfileCardStore } from '../model/profileCardStore'
 import { useInitProfileStore } from '../lib/useInitProfileStore'
 import { ChangeInfo } from '@/features/user/changeInfo'
 import { ChangePassword } from '@/features/user/changePassword'
+import { UserRooms } from '@/features/room/userRooms'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import styles from './ProfileCard.module.scss'
 
@@ -45,7 +46,7 @@ export const ProfileCard = () => {
       <div className={styles['profile-card__content']}>
         {activeTab === 'profile' && <ChangeInfo />}
         {activeTab === 'password' && <ChangePassword />}
-        {activeTab === 'rooms' && <p>Комнаты</p>}
+        {activeTab === 'rooms' && <UserRooms />}
       </div>
     </div>
   )

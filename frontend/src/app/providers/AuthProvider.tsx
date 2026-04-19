@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     if (error) {
-      errorAlert('Ошибка аутентификации', error)
+      errorAlert('Ошибка', error)
     }
   }, [error, errorAlert])
 

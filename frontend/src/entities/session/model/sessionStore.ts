@@ -68,6 +68,7 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
       }
     } catch (error) {
       let messageError: string
+
       if (error instanceof AppError) {
         messageError = getErrorMessage(error)
       } else {
@@ -76,6 +77,7 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
       }
 
       tokenService.remove()
+
       set({
         status: 'unauthenticated',
         accessToken: null,

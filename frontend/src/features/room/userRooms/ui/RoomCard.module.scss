@@ -1,0 +1,35 @@
+.room-card {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  padding: 10px;
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  &__id {
+    font-size: 12px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__enter-btn {
+    height: auto;
+    padding: 5px 10px;
+  }
+
+  &__leave-btn button {
+    height: auto;
+    padding: 5px 10px;
+  }
+}
