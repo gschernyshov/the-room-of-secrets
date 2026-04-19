@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS messages (
-    id UUID PRIMARY KEY,
-    room_id UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
-    sender_id INTEGER NOT NULL,
-    content TEXT NOT NULL,
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id UUID PRIMARY KEY,
+  room_id UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+  sender_id INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_room_id ON messages (room_id);
