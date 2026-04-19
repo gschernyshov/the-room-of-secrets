@@ -17,10 +17,6 @@ export const initializeSocketServer = (
     },
   })
 
-  io.on('error', error => {
-    logger.error(`В Socket.IO сервере возникла ошибка : ${error}`)
-  })
-
   io.use((socket, next) => {
     const token = socket.handshake.auth?.token
     if (!token) {
@@ -48,7 +44,7 @@ export const initializeSocketServer = (
       `Пользователь id: ${userId} подключился к серверу через сокет id: ${socket.id}`
     )
 
-    roomHandler(socket, userId)
+    roomHandler(io, socket, userId)
     messageHandler(socket, userId)
 
     socket.on('disconnect', reason => {
@@ -62,5 +58,9 @@ export const initializeSocketServer = (
         `Ошибка сокета id: ${socket.id} пользователя id: ${socket.data.user.id}: ${error}`
       )
     })
+  })
+
+  io.on('error', error => {
+    logger.error(`В Socket.IO сервере возникла ошибка : ${error}`)
   })
 }
