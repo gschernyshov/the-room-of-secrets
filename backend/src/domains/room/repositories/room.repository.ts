@@ -32,14 +32,14 @@ class RoomRepository {
     return room ?? null
   }
 
-  async join(roomId: Room['id'], userId: User['id']): Promise<void> {
-    await db.query(
+  async join(roomId: Room['id'], userId: User['id']): Promise<Room | null> {
+    const [room] = await db.query<Room>(
       `
         -- Добавляем участника в комнату, только если его ещё нет:
         -- Проверяем через NOT EXISTS, не существует ли уже элемент с таким userId в массиве participants
         -- Если пользователь уже есть — запрос ничего не делает (пропускаем UPDATE)
         -- Если нет — добавляем нового участника в формате JSONB с полями: userId и status
-        -- Возвращаем обновлённый массив participants
+        -- Возвращаем комнату ТОЛЬКО ЕСЛИ участник был добавлен (если до этого его не было)
         UPDATE rooms
         SET participants = participants || jsonb_build_array(
           jsonb_build_object('userId', $2::int, 'status', 'active')
@@ -50,9 +50,12 @@ class RoomRepository {
             FROM jsonb_array_elements(participants) AS elem
             WHERE (elem->>'userId')::int = $2
           )
+        RETURNING id, name, participants, created_at AS "createdAt";
       `,
       [roomId, userId]
     )
+
+    return room ?? null
   }
 
   async leave(

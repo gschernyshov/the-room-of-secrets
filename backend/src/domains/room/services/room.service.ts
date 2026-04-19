@@ -46,11 +46,11 @@ export const roomService = {
         throw new AppError('Комната не найдена', 401)
       }
 
-      await roomRepository.join(roomId, userId)
+      const updatedRoom = await roomRepository.join(roomId, userId)
 
       eventBus.emit(ROOM_JOINED, { roomId, name: room.name, userId })
 
-      return room
+      return updatedRoom ?? room
     } catch (error) {
       logger.error(
         `При присоединении пользователя id: ${userId} к комнате id: ${roomId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
