@@ -20,3 +20,5 @@ export const registerMetrics = (req, res, next) => {
 export const getMetrics = async () => {
   return await client.register.metrics()
 }
+
+export default registerMetrics
