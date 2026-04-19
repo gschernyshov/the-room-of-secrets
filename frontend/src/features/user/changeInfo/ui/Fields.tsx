@@ -6,7 +6,7 @@ export const Fields = () => {
   return (
     <div className={styles['fields-container']}>
       {fieldNames.map(nameField => (
-        <Field nameField={nameField} />
+        <Field key={nameField} nameField={nameField} />
       ))}
     </div>
   )

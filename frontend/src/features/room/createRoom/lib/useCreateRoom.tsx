@@ -10,8 +10,6 @@ export const useCreateRoom = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const createRoom = async (name: Room['name']) => {
-    if (!name.trim()) return
-
     setIsLoading(true)
     try {
       const response = await apiFetch('/room/create', {

@@ -2,7 +2,7 @@ import { useState, type SubmitEvent } from 'react'
 import { TextInput, Button } from '@gravity-ui/uikit'
 import { useCreateRoom } from '../lib/useCreateRoom'
 import { useShowAlert } from '@/widgets/globalAlert'
-import { AppError } from '@/shared/utils/errors'
+import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import styles from './CreateRoomForm.module.scss'
 
 type Props = {
@@ -22,8 +22,7 @@ export const CreateRoomForm = ({ onPopupOpen }: Props) => {
 
       onPopupOpen(false)
     } catch (error) {
-      if (error instanceof AppError)
-        errorAlert('Ошибка отправки сообщения', error.message)
+      errorAlert('Ошибка создания комнаты', getErrorMessage(error))
     }
   }
 
