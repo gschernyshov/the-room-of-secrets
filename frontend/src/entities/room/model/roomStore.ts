@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { type Room } from '../types'
-import type { User } from '@/entities/user/model/types'
+import { type User } from '@/entities/user/model/types'
 
 type RoomState = {
   currentRoom: Room | null
@@ -9,7 +9,6 @@ type RoomState = {
 type RoomActions = {
   setCurrentRoom: (room: Room | null) => void
   addUser: (userId: User['id']) => void
-  removeUser: (userId: User['id']) => void
 }
 
 export const useRoomStore = create<RoomState & RoomActions>(set => ({
@@ -18,20 +17,23 @@ export const useRoomStore = create<RoomState & RoomActions>(set => ({
   setCurrentRoom: room => set({ currentRoom: room }),
 
   addUser: (userId: User['id']) =>
-    set(state => ({
-      currentRoom: {
-        ...state.currentRoom!,
-        participants: [...state.currentRoom!.participants, userId],
-      },
-    })),
+    set(state => {
+      const currentRoom = state.currentRoom
+      if (!currentRoom) return state
 
-  removeUser: (userId: User['id']) =>
-    set(state => ({
-      currentRoom: {
-        ...state.currentRoom!,
-        participants: state.currentRoom!.participants.filter(
-          id => id !== userId
-        ),
-      },
-    })),
+      const alreadyExists = currentRoom.participants.some(
+        participant => participant.userId === userId
+      )
+      if (alreadyExists) return state
+
+      return {
+        currentRoom: {
+          ...currentRoom,
+          participants: [
+            ...currentRoom.participants,
+            { userId, status: 'active' },
+          ],
+        },
+      }
+    }),
 }))
