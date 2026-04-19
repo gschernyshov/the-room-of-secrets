@@ -9,7 +9,7 @@ export const startMessageFlushWorker = (intervalMs = 5000) => {
       logger.success('Фоновая задача по сбросу сообщений выполнена успешно')
     } catch (error) {
       logger.error(
-        `Ошибка в фоновом процессе сохранения сообщений: ${error.message}`
+        `Ошибка в фоновом процессе сохранения сообщений${error instanceof Error ? `: ${error.message}` : ``}`
       )
     }
   }, intervalMs)
