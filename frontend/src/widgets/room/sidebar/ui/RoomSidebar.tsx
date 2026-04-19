@@ -1,10 +1,12 @@
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { useRoomStore } from '@/entities/room/model/roomStore'
 import styles from './RoomSidebar.module.scss'
+import { usePresenceStore } from '@/entities/room/model/presenceStore'
 
 export const RoomSidebar = () => {
   const { user } = useSessionStore()
   const { currentRoom } = useRoomStore()
+  const { onlineUserIds } = usePresenceStore()
 
   return (
     <div className={styles['room-sidebar']}>
@@ -12,10 +14,17 @@ export const RoomSidebar = () => {
         Участники ({currentRoom?.participants.length})
       </h3>
 
-      <ul className={styles['room-sidebar__list']}>
+      <ul>
         {currentRoom?.participants.map(participant => (
-          <li key={participant} className={styles['room-sidebar__item']}>
-            Пользователь с id {participant} {participant === user?.id && '(Вы)'}
+          <li key={participant.userId}>
+            Пользователь {participant.userId}
+            {participant.userId === user?.id && ' (Вы)'}
+            {participant.userId !== user?.id && (
+              <span>
+                {' '}
+                — {onlineUserIds.has(participant.userId) ? '🟢' : '⚪'}
+              </span>
+            )}
           </li>
         ))}
       </ul>
