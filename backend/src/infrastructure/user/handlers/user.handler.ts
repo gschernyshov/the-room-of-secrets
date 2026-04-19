@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { userService } from '../../../domains/user/services/user.service.js'
+import { AppError } from '../../../shared/utils/errors.js'
 
 export const userHandler = {
   me: async (req: Request, res: Response): Promise<Response> => {
@@ -8,65 +9,98 @@ export const userHandler = {
     try {
       const user = await userService.me(userId)
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         data: user,
       })
     } catch (error) {
-      res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
+        success: false,
+        error: {
+          message:
+            'При запросе данных пользователя возникла непредвиденная ошибка',
+        },
+      })
     }
   },
 
   updateUsername: async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user.id
-    const { username } = req.body
+    const username = req.body.username
 
     try {
       await userService.updateUsername(userId, username)
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
       })
     } catch (error) {
-      res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
+        success: false,
+        error: {
+          message: 'При обновлении username возникла непредвиденная ошибка',
+        },
+      })
     }
   },
 
   updateEmail: async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user.id
-    const { email } = req.body
+    const email = req.body.email
 
     try {
       await userService.updateEmail(userId, email)
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
       })
     } catch (error) {
-      res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
+        success: false,
+        error: {
+          message: 'При обновлении email возникла непредвиденная ошибка',
+        },
+      })
     }
   },
 
   updatePassword: async (req: Request, res: Response): Promise<Response> => {
     const userId = req.user.id
-    const { password } = req.body
+    const password = req.body.password
 
     try {
       await userService.updatePassword(userId, password)
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
       })
     } catch (error) {
-      res
-        .status(error.statusCode)
-        .json({ success: false, error: { message: error.message } })
+      if (error instanceof AppError)
+        return res
+          .status(error.statusCode)
+          .json({ success: false, error: { message: error.message } })
+
+      return res.status(500).json({
+        success: false,
+        error: {
+          message: 'При обновлении пароля возникла непредвиденная ошибка',
+        },
+      })
     }
   },
 }
