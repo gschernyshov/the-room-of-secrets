@@ -47,12 +47,6 @@ export const initializeSocketServer = (
     roomHandler(io, socket, userId)
     messageHandler(socket, userId)
 
-    socket.on('disconnect', reason => {
-      logger.info(
-        `Пользователь id: ${userId} отключился. Причина: ${reason}. Cокет id: ${socket.id}`
-      )
-    })
-
     socket.on('error', error => {
       logger.error(
         `Ошибка сокета id: ${socket.id} пользователя id: ${socket.data.user.id}: ${error}`

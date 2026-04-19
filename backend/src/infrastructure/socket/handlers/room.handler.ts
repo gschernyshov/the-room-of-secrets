@@ -142,7 +142,11 @@ export const roomHandler = (io: Server, socket: Socket, userId: User['id']) => {
     }
   )
 
-  socket.on('disconnect', async => {
+  socket.on('disconnect', reason => {
+    logger.info(
+      `Пользователь id: ${userId} отключился. Причина: ${reason}. Cокет id: ${socket.id}`
+    )
+
     // Получаем список комнат, в которых был пользователь
     // (хранится в памяти, потому что socket.rooms уже пуст, т. к.
     // Socket.IO автоматически удаляет сокет из всех комнат до вызова этого обработчика)
