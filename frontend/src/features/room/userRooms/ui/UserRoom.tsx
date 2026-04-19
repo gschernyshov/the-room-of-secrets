@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Button, Popup } from '@gravity-ui/uikit'
 import { RoomCard } from './RoomCard'
 import { type Room } from '@/entities/room/types'
@@ -9,13 +9,26 @@ type Props = {
 }
 
 export const UserRoom = ({ room }: Props) => {
-  const triggerRef = useRef<HTMLButtonElement>(null)
   const userRoomRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const timeoutRef = useRef<number | null>(null)
   const [popupOpen, setPopupOpen] = useState(false)
 
   useOnClickOutside(userRoomRef, () => {
-    if (popupOpen) setPopupOpen(false)
+    if (popupOpen) {
+      timeoutRef.current = setTimeout(() => {
+        setPopupOpen(false)
+      }, 50)
+    }
   })
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   return (
     <div ref={userRoomRef}>

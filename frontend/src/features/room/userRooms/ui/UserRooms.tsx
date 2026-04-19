@@ -6,12 +6,17 @@ import styles from './UserRooms.module.scss'
 export const UserRooms = () => {
   const { isLoading, rooms, error } = useRoomListStore()
 
-  if (isLoading) return <Loader />
+  if (isLoading) {
+    return <Loader />
+  }
 
-  if (error) return <p className={styles['user-rooms__text-info']}>{error}</p>
+  if (error) {
+    return <p className={styles['user-rooms__text-info']}>{error}</p>
+  }
 
-  if (!rooms.length)
+  if (!rooms.length) {
     return <p className={styles['user-rooms__text-info']}>Комнаты не найдены</p>
+  }
 
   return (
     <div className={styles['user-rooms']}>
