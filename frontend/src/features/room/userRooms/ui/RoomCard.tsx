@@ -22,8 +22,11 @@ export const RoomCard = ({ room }: Props) => {
       </div>
       <div className={styles['room-card__actions']}>
         <Button
-          className={styles['room-card__enter-btn']}
+          view="outlined"
+          size="l"
+          pin="round-round"
           onClick={() => goToRoom(room.id)}
+          className={styles['room-card__enter-btn']}
         >
           Войти
         </Button>
