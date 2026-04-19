@@ -12,6 +12,8 @@ export type QueryParam =
   | boolean[]
   | null[]
   | Date[]
+  | Record<string, any>
+  | Record<string, any>[]
 
 types.setTypeParser(1184, stringValue => {
   return new Date(stringValue)
@@ -32,7 +34,8 @@ export const db = {
       await pool.query('SELECT NOW()')
       logger.success('Подключение к БД успешно выполнено')
     } catch (error) {
-      logger.error(`Ошибка подключения к БД: ${error.message}`)
+      if (error instanceof Error)
+        logger.error(`Ошибка подключения к БД: ${error.message}`)
       throw error
     }
   },
@@ -56,7 +59,7 @@ export const db = {
       const result = await pool.query<T>(text, params)
       return result.rows
     } catch (error) {
-      logger.error(`SQL Error: ${error.message}`)
+      if (error instanceof Error) logger.error(`SQL Error: ${error.message}`)
       throw error
     }
   },
