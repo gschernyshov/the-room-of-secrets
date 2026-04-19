@@ -7,11 +7,34 @@ import { logger } from '../../../shared/utils/logger.js'
 import { AppError } from '../../../shared/utils/errors.js'
 
 export const messageService = {
+  get: async (roomId: Room['id']): Promise<Message[]> => {
+    logger.info(`Получение сообщений комнаты id: ${roomId}`)
+
+    try {
+      const messages = await messageRepository.get(roomId)
+
+      return messages
+    } catch (error) {
+      logger.error(
+        `При получении сообщений комнаты id: ${roomId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+      )
+
+      throw new AppError(
+        'При получении сообщений возникла непредвиденная ошибка',
+        500
+      )
+    }
+  },
+
   send: async (
     roomId: Room['id'],
     senderId: User['id'],
     content: Message['content']
   ): Promise<Message> => {
+    logger.info(
+      `Пользователь id: ${senderId} отправляет сообщение: ${content} в комнате id: ${roomId}`
+    )
+
     try {
       const message: Message = {
         id: randomUUID(),
@@ -25,7 +48,9 @@ export const messageService = {
 
       return message
     } catch (error) {
-      logger.error(`При отправке сообщения возникла ошибка: ${error.message}`)
+      logger.error(
+        `При отправке сообщения: ${content} пользователем id: ${senderId} в комнате id: ${roomId} возникла ошибка:${error instanceof Error ? `: ${error.message}` : ``}}`
+      )
 
       throw new AppError(
         'При отправке сообщения возникла непредвиденная ошибка',
