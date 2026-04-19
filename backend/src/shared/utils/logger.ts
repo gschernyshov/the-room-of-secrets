@@ -1,5 +1,5 @@
-import { mkdirSync, existsSync, appendFile } from 'fs'
 import { join } from 'path'
+import { mkdirSync, existsSync, appendFile } from 'fs'
 
 enum LogLevel {
   PROGRESS = 'PROGRESS',

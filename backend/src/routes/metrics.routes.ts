@@ -6,11 +6,14 @@ const router = Router()
 
 router.get('/metrics', async (_, res) => {
   try {
-    res.set('Content-Type', register.contentType)
     const metrics = await getMetrics()
+
+    res.set('Content-Type', register.contentType)
     res.send(metrics)
-  } catch (err) {
-    res.status(500).end(err.message)
+  } catch (error) {
+    res
+      .status(500)
+      .end(error instanceof Error ? error.message : 'Внутренняя ошибка сервера')
   }
 })
 
