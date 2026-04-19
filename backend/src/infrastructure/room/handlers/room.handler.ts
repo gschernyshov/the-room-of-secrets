@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { roomService } from '../../../domains/room/services/room.service.js'
 import { userService } from '../../../domains/user/services/user.service.js'
 import { AppError } from '../../../shared/utils/errors.js'
+import { messageService } from '../../../domains/message/services/message.service.js'
 
 export const roomHandler = {
   create: async (req: Request, res: Response): Promise<Response> => {
@@ -37,7 +38,8 @@ export const roomHandler = {
     const roomId = req.body.id
 
     try {
-      await roomService.leave(roomId, userId)
+      const deletedRoom = await roomService.leave(roomId, userId)
+      if (deletedRoom) messageService.deleteByRoomId(roomId)
 
       await userService.deleteRoom(userId, roomId)
 

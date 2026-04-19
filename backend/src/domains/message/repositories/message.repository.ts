@@ -91,12 +91,12 @@ class MessageRepository {
     // Получаем старые сообщения из базы данных (до 1000 шт.)
     const dbMessages = await db.query<Message>(
       `
-      SELECT id, room_id AS "roomId", sender_id AS "senderId", content, timestamp
-      FROM messages
-      WHERE room_id = $1
-      ORDER BY timestamp ASC
-      LIMIT 1000
-    `,
+        SELECT id, room_id AS "roomId", sender_id AS "senderId", content, timestamp
+        FROM messages
+        WHERE room_id = $1
+        ORDER BY timestamp ASC
+        LIMIT 1000
+      `,
       [roomId]
     )
 
@@ -118,6 +118,63 @@ class MessageRepository {
 
     // Возвращаем итоговый список сообщений
     return uniqueMessages
+  }
+
+  async deleteByRoomId(roomId: string): Promise<void> {
+    const client = redis.getClient()
+
+    /*
+    Удаление сообщений по room_id не требуется, потому что в таблице messages установлено:
+    room_id UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE
+
+    Это означает, что при удалении комнаты (из таблицы `rooms`) все связанные сообщения
+    автоматически удаляются на уровне базы данных.
+
+    Явный запрос на удаление сообщений излишен и может быть пропущен.
+
+    await db.query(
+      `
+        DELETE 
+        FROM messages 
+        WHERE room_id = $1
+      `,
+      [roomId]
+    )*/
+
+    // Получаем все сообщения из батч-буфера
+    const rawBatchMessages = await client.lRange(
+      MessageRepository.BATCH_KEY,
+      0,
+      -1
+    )
+
+    if (rawBatchMessages.length === 0) return
+
+    const roomMessagesToKeep: string[] = [] // Сюда складываем сообщения НЕ из удаляемой комнаты
+
+    // Парсим каждое сообщение и оставляем только те, которые НЕ принадлежат удаляемой комнате
+    for (const rawMessage of rawBatchMessages) {
+      try {
+        const parsedMessage = JSON.parse(rawMessage)
+        if (parsedMessage.roomId !== roomId) {
+          roomMessagesToKeep.push(rawMessage) // Оставляем сообщение
+        }
+        // Если parsedMessage.roomId === roomId, то сообщение пропускается (удаляется)
+      } catch {
+        // Если не удалось распарсить JSON, то сохраняем "как есть", чтобы не потерять данные
+        roomMessagesToKeep.push(rawMessage)
+      }
+    }
+
+    await client.del(MessageRepository.BATCH_KEY) // Удаляем старый список
+
+    if (roomMessagesToKeep.length > 0) {
+      // Возвращаем обратно только отфильтрованные сообщения
+      await client.lPush(MessageRepository.BATCH_KEY, roomMessagesToKeep)
+    }
+
+    // Удаляем кэш сообщений конкретной комнаты из Redis
+    await client.del(`${MessageRepository.ROOM_KEY}:${roomId}`)
   }
 
   /**
@@ -244,9 +301,7 @@ class MessageRepository {
         } catch (error) {
           // Если ошибка при вставке — пробрасываем её
           // Это остановит выполнение и предотвратит удаление сообщений из Redis
-          logger.error(
-            `Ошибка при вставке пакета из ${dbBatch.length} сообщений: ${error.message}`
-          )
+
           throw error // Прерываем, чтобы не удалять из очереди
         }
       }

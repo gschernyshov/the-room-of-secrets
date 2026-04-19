@@ -58,4 +58,21 @@ export const messageService = {
       )
     }
   },
+
+  deleteByRoomId: async (roomId: Room['id']): Promise<void> => {
+    logger.info(`Удаление сообщений комнаты id: ${roomId}`)
+
+    try {
+      await messageRepository.deleteByRoomId(roomId)
+    } catch (error) {
+      logger.error(
+        `При удалении сообщений комнаты id: ${roomId} возникла ошибка:${error instanceof Error ? `: ${error.message}` : ``}}`
+      )
+
+      throw new AppError(
+        'При удалении сообщений возникла непредвиденная ошибка',
+        500
+      )
+    }
+  },
 }

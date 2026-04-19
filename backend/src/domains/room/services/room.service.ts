@@ -67,7 +67,7 @@ export const roomService = {
     }
   },
 
-  leave: async (roomId: Room['id'], userId: User['id']): Promise<void> => {
+  leave: async (roomId: Room['id'], userId: User['id']): Promise<boolean> => {
     logger.info(`Пользователь id: ${userId} выходит из комнаты id: ${roomId}`)
 
     try {
@@ -83,6 +83,8 @@ export const roomService = {
       )
 
       if (deleted) await roomRepository.delete(roomId)
+
+      return deleted
     } catch (error) {
       logger.error(
         `При выходе из комнаты id: ${roomId} пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
