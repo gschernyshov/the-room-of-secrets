@@ -27,7 +27,9 @@ const startServer = async () => {
       logger.success(`HTTP и Socket.IO сервер запущен на порту: ${PORT}`)
     })
   } catch (error) {
-    logger.error(`Критическая ошибка при запуске сервера: ${error.message}`)
+    logger.error(
+      `Критическая ошибка при запуске сервера${error instanceof Error ? ` :${error.message}` : ''}`
+    )
     process.exit(1)
   }
 }

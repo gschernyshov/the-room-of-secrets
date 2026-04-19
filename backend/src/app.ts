@@ -5,7 +5,8 @@ import cookieParser from 'cookie-parser'
 import metricsRoutes from './routes/metrics.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import userRoutes from './routes/user.routes.js'
-import { registerMetrics } from './infrastructure/monitoring/metrics.js'
+import roomRoutes from './routes/room.routes.js'
+import registerMetrics from './infrastructure/monitoring/metrics.js'
 
 export const app = express()
 
@@ -24,3 +25,4 @@ app.get('/metrics', metricsRoutes)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
+app.use('/api/room', roomRoutes)
