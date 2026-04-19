@@ -61,6 +61,6 @@ export const initializeSocketServer = (
   })
 
   io.on('error', error => {
-    logger.error(`В Socket.IO сервере возникла ошибка : ${error}`)
+    logger.error(`В Socket.IO сервере возникла ошибка: ${error}`)
   })
 }

@@ -17,6 +17,8 @@ export const authService = {
     email: User['email'],
     password: User['password']
   ): Promise<CreateSessionResult & { user: User }> => {
+    logger.info(`Регистрация пользователя (${username}, ${email})`)
+
     try {
       const existingUser = await userRepository.findByEmailOrUsername(
         email,
@@ -46,7 +48,7 @@ export const authService = {
       }
     } catch (error) {
       logger.error(
-        `При регистрации пользователя (${username}, ${email}) возникла ошибка: ${error.message.toLowerCase()}`
+        `При регистрации пользователя (${username}, ${email}) возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
       )
 
       if (error instanceof AppError) {
@@ -64,7 +66,7 @@ export const authService = {
     email: User['email'],
     password: User['password']
   ): Promise<CreateSessionResult & { user: User }> => {
-    logger.info(`Авторизация пользователя с email: ${email}`)
+    logger.info(`Аутентификация пользователя с email: ${email}`)
 
     try {
       const user = await userRepository.findByEmail(email)
@@ -90,7 +92,7 @@ export const authService = {
       }
     } catch (error) {
       logger.error(
-        `При авторизации пользователя с email: ${email} возникла ошибка: ${error.message.toLowerCase()}`
+        `При аутентификации пользователя с email: ${email} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
       )
 
       if (error instanceof AppError) {
@@ -98,7 +100,7 @@ export const authService = {
       }
 
       throw new AppError(
-        'При авторизации пользователя возникла непредвиденная ошибка',
+        'При аутентификации пользователя возникла непредвиденная ошибка',
         500,
         'AUTH_FAILED'
       )
@@ -106,20 +108,25 @@ export const authService = {
   },
 
   logout: async (userId: User['id'], refreshToken: string): Promise<void> => {
+    logger.info(`Пользователь id: ${userId} выходит из системы`)
+
     try {
       await sessionService.invalidate(userId, refreshToken)
 
       logger.info(`Пользователь id: ${userId} успешно вышел`)
     } catch (error) {
       logger.error(
-        `При выходе пользователя id: ${userId} возникла ошибка: ${error.message.toLowerCase()}`
+        `При выходе пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
       )
 
       if (error instanceof AppError) {
         throw error
       }
 
-      throw new AppError('Не удалось выйти', 500)
+      throw new AppError(
+        'При выходе из системы возникла непредвиденная ошибка',
+        500
+      )
     }
   },
 
@@ -128,7 +135,7 @@ export const authService = {
       return await sessionService.refresh(refreshToken)
     } catch (error) {
       logger.error(
-        `При выдаче access token и refresh token возникла ошибка: ${error.message.toLowerCase()}`
+        `При выдаче access token и refresh token возникла ошибка${error instanceof Error ? `: ${error.message.toLowerCase()}` : ``}}`
       )
 
       if (error instanceof AppError) {

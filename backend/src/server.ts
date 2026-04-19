@@ -28,7 +28,7 @@ const startServer = async () => {
     })
   } catch (error) {
     logger.error(
-      `Критическая ошибка при запуске сервера${error instanceof Error ? ` :${error.message}` : ''}`
+      `Критическая ошибка при запуске сервера${error instanceof Error ? `: ${error.message}` : ''}`
     )
     process.exit(1)
   }

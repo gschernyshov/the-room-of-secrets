@@ -47,24 +47,20 @@ export const messageHandler = (socket: Socket, userId: User['id']) => {
 
         return callback?.({ success: true })
       } catch (error) {
+        logger.error(
+          `При отправке пользователем сообщения возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
+        )
+
         if (error instanceof AppError)
           return callback?.({
             success: false,
             error: { message: error.message },
           })
 
-        const errorMessage =
-          error instanceof Error ? error.message : 'неизвестная ошибка'
-
-        if (error instanceof Error)
-          logger.error(
-            `При отправке пользователем сообщения возникла ошибка: ${errorMessage}`
-          )
-
         return callback?.({
           success: false,
           error: {
-            message: 'При отправке сообщения возникла ошибка',
+            message: 'При отправке сообщения возникла непредвиденная ошибка',
           },
         })
       }
