@@ -67,9 +67,10 @@ export const authHandler = {
       })
     } catch (error) {
       if (error instanceof AppError)
-        return res
-          .status(error.statusCode)
-          .json({ success: false, error: { message: error.message } })
+        return res.status(error.statusCode).json({
+          success: false,
+          error: { message: error.message, type: error.type },
+        })
 
       return res.status(500).json({
         success: false,

@@ -24,7 +24,7 @@ export const userService = {
       return user
     } catch (error) {
       logger.error(
-        `При запросе данных пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При запросе данных пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -60,7 +60,7 @@ export const userService = {
       eventBus.emit(UPDATED_USERNAME, user)
     } catch (error) {
       logger.error(
-        `При обновлении username пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При обновлении username пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -94,7 +94,7 @@ export const userService = {
       eventBus.emit(UPDATED_EMAIL, user)
     } catch (error) {
       logger.error(
-        `При обновлении email пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При обновлении email пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -127,7 +127,7 @@ export const userService = {
       eventBus.emit(UPDATED_PASSWORD, user)
     } catch (error) {
       logger.error(
-        `При обновлении пароля пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При обновлении пароля пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -148,7 +148,7 @@ export const userService = {
       await userRepository.addRoom(userId, roomId)
     } catch (error) {
       logger.error(
-        `При добавлении комнаты ${roomId} пользователю id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При добавлении комнаты ${roomId} пользователю id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       throw new AppError(
@@ -165,7 +165,7 @@ export const userService = {
       await userRepository.deleteRoom(userId, roomId)
     } catch (error) {
       logger.error(
-        `При удалении комнаты ${roomId} пользователя id: ${userId} возникла ошибка${error instanceof Error ? ` : ${error.message}` : ``}}`
+        `При удалении комнаты ${roomId} пользователя id: ${userId} возникла ошибка${error instanceof Error ? ` : ${error.message}` : ``}`
       )
 
       throw new AppError(

@@ -21,7 +21,7 @@ export const roomService = {
       return room
     } catch (error) {
       logger.error(
-        `При создании комнаты "${name}" пользователем id: ${creatorId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При создании комнаты "${name}" пользователем id: ${creatorId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -53,7 +53,7 @@ export const roomService = {
       return updatedRoom ?? room
     } catch (error) {
       logger.error(
-        `При присоединении пользователя id: ${userId} к комнате id: ${roomId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При присоединении пользователя id: ${userId} к комнате id: ${roomId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -73,7 +73,7 @@ export const roomService = {
     try {
       const rooms = await roomRepository.leave(roomId, userId)
       if (!rooms) {
-        throw new AppError('Не удалось выйти из команты', 500)
+        throw new AppError('Не удалось выйти из комнаты', 500)
       }
 
       // Проверяем, ушли ли ВСЕ участники из комнаты:
@@ -87,7 +87,7 @@ export const roomService = {
       return deleted
     } catch (error) {
       logger.error(
-        `При выходе из комнаты id: ${roomId} пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При выходе из комнаты id: ${roomId} пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -113,7 +113,7 @@ export const roomService = {
       return rooms
     } catch (error) {
       logger.error(
-        `При получении комнат пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При получении комнат пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {

@@ -16,7 +16,7 @@ export const messageService = {
       return messages
     } catch (error) {
       logger.error(
-        `При получении сообщений комнаты id: ${roomId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При получении сообщений комнаты id: ${roomId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       throw new AppError(
@@ -49,7 +49,7 @@ export const messageService = {
       return message
     } catch (error) {
       logger.error(
-        `При отправке сообщения: ${content} пользователем id: ${senderId} в комнате id: ${roomId} возникла ошибка:${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При отправке сообщения: ${content} пользователем id: ${senderId} в комнате id: ${roomId} возникла ошибка:${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       throw new AppError(
@@ -66,7 +66,7 @@ export const messageService = {
       await messageRepository.deleteByRoomId(roomId)
     } catch (error) {
       logger.error(
-        `При удалении сообщений комнаты id: ${roomId} возникла ошибка:${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При удалении сообщений комнаты id: ${roomId} возникла ошибка:${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       throw new AppError(

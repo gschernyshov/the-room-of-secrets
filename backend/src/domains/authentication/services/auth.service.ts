@@ -48,7 +48,7 @@ export const authService = {
       }
     } catch (error) {
       logger.error(
-        `При регистрации пользователя (${username}, ${email}) возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При регистрации пользователя (${username}, ${email}) возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -92,7 +92,7 @@ export const authService = {
       }
     } catch (error) {
       logger.error(
-        `При аутентификации пользователя с email: ${email} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При аутентификации пользователя с email: ${email} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -116,7 +116,7 @@ export const authService = {
       logger.info(`Пользователь id: ${userId} успешно вышел`)
     } catch (error) {
       logger.error(
-        `При выходе пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}}`
+        `При выходе пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -135,7 +135,7 @@ export const authService = {
       return await sessionService.refresh(refreshToken)
     } catch (error) {
       logger.error(
-        `При выдаче access token и refresh token возникла ошибка${error instanceof Error ? `: ${error.message.toLowerCase()}` : ``}}`
+        `При выдаче access token и refresh token возникла ошибка${error instanceof Error ? `: ${error.message.toLowerCase()}` : ``}`
       )
 
       if (error instanceof AppError) {
