@@ -19,7 +19,7 @@ import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 
 export const RoomPage = () => {
   const { roomId } = useParams()
-  const isConnected = useSocketStore(state => state.isConnected)
+  const { isConnecting, isConnected } = useSocketStore()
   const user = useSessionStore(state => state.user)
   const currentRoom = useRoomStore(state => state.currentRoom)
   const { errorAlert } = useShowAlert()
@@ -55,7 +55,7 @@ export const RoomPage = () => {
     }
   }, [roomId, isConnected, user])
 
-  if (!currentRoom) {
+  if (!isConnecting || !currentRoom) {
     return <div>Загрузка комнаты...</div>
   }
 

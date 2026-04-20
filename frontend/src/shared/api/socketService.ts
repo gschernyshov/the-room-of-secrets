@@ -16,11 +16,13 @@ let socket: SocketWithTimer | null = null
 export const socketService = {
   connect: (token: string): Promise<void> => {
     return new Promise((resolve, reject) => {
+      // Если уже подключён — сразу resolve
       if (socket?.connected) {
         resolve()
         return
       }
 
+      // Создаём или обновляем сокет
       if (!socket) {
         socket = io(SOCKET_URL, {
           auth: { token },
@@ -28,6 +30,7 @@ export const socketService = {
           reconnection: true,
           reconnectionAttempts: Infinity,
           reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
         })
       } else {
         socket.auth = { token }
@@ -37,38 +40,23 @@ export const socketService = {
       }
 
       const onConnect = () => {
-        console.log('[SOCKET] Подключено')
-        if (socket?._connectTimer) {
-          clearTimeout(socket._connectTimer)
-          delete socket._connectTimer
-        }
+        socket?.off('connect_error', onError)
         resolve()
       }
 
       const onError = (error: Error) => {
-        if (socket?._connectTimer) {
-          clearTimeout(socket._connectTimer)
-          delete socket._connectTimer
-        }
+        socket?.off('connect', onConnect)
         reject(new AppError(error.message))
       }
 
+      // Подписываемся один раз
       socket.once('connect', onConnect)
       socket.once('connect_error', onError)
-
-      socket._connectTimer = setTimeout(() => {
-        if (socket?.connected) return
-        reject(new Error('Не удалось установить соединение с сервером'))
-      }, 10000)
     })
   },
 
   disconnect: (): void => {
     if (socket) {
-      if (socket._connectTimer) {
-        clearTimeout(socket._connectTimer)
-        delete socket._connectTimer
-      }
       socket.disconnect()
     }
   },
@@ -105,7 +93,7 @@ export const socketService = {
 
     const isExpired = checkIfTokenExpired(accessToken)
     if (isExpired) {
-      console.log('[SOCKET] Токен истёк, обновляем...')
+      console.log('[SOCKET_SERVICE] Токен истёк, обновляем...')
 
       try {
         const response = await apiFetch('/user/me')
@@ -123,7 +111,7 @@ export const socketService = {
           throw new AppError('Не удалось обновить токен')
         }
       } catch (error) {
-        console.error('[SOCKET] Не удалось обновить токен')
+        console.error('[SOCKET_SERVICE] Не удалось обновить токен')
 
         if (error instanceof AppError) throw error
 

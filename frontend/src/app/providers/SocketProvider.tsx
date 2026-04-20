@@ -13,20 +13,33 @@ type Props = {
 export const SocketProvider = ({ children }: Props) => {
   const accessToken = useSessionStore(state => state.accessToken)
   const { setConnecting, setConnected, setDisconnected } = useSocketStore()
-  const { errorAlert } = useShowAlert()
+  const { successAlert, errorAlert } = useShowAlert()
+
+  useEffect(() => {
+    if (!accessToken) {
+      socketService.disconnect()
+      setDisconnected()
+      return
+    }
+
+    setConnecting()
+    socketService.connect(accessToken).catch(() => {})
+  }, [accessToken])
 
   useEffect(() => {
     const handleConnect = () => {
-      console.log('[SocketProvider] Подключено')
+      console.log('[SOCKET_PROVIDER] Подключено')
+      successAlert('Подключение к серверу', 'Вы успешно подключились к серверу')
       setConnected()
     }
 
     const handleDisconnect = (reason: string) => {
-      console.log('[SocketProvider] Отключено:', reason)
+      console.log('[SOCKET_PROVIDER] Отключено: ', reason)
+      successAlert('Подключение к серверу', 'Вы отключились от сервера')
       setDisconnected()
     }
 
-    const handleConnectError = async (error: unknown) => {
+    const handleConnectError = async (error: Error) => {
       if (
         isErrorMessage(error) &&
         error.message.includes('Требуется аутентификация')
@@ -36,8 +49,9 @@ export const SocketProvider = ({ children }: Props) => {
           await socketService.connectWithFreshToken()
         } catch (error) {
           errorAlert('Ошибка подключения к серверу: ', getErrorMessage(error))
-          setDisconnected()
         }
+      } else {
+        errorAlert('Ошибка подключения к серверу: ', error.message)
       }
     }
 
@@ -53,23 +67,17 @@ export const SocketProvider = ({ children }: Props) => {
   }, [])
 
   useEffect(() => {
-    if (!accessToken) {
-      socketService.disconnect()
-      setDisconnected()
-      return
-    }
-
-    const connect = async () => {
-      setConnecting()
-      try {
-        await socketService.connect(accessToken)
-      } catch (error) {
-        errorAlert('Ошибка подключения к серверу: ', getErrorMessage(error))
-        setDisconnected()
+    const handleVisibilityChange = () => {
+      if (!document.hidden && accessToken) {
+        setConnecting()
+        socketService.connect(accessToken).catch(() => {})
       }
     }
 
-    connect()
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [accessToken])
 
   return <>{children}</>
