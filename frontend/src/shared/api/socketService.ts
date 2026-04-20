@@ -1,6 +1,9 @@
 import { io, type Socket } from 'socket.io-client'
 import { AppError } from '../utils/errors'
 import { type SocketCallback } from '../types/socket.types'
+import { apiFetch } from './apiFetch'
+import { checkIfTokenExpired } from '../utils/jwt'
+import { tokenService } from '../auth/lib/tokenService'
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:8000'
 
@@ -18,43 +21,45 @@ export const socketService = {
         return
       }
 
-      if (socket) {
-        if (socket._connectTimer) {
-          clearTimeout(socket._connectTimer)
-          delete socket._connectTimer
+      if (!socket) {
+        socket = io(SOCKET_URL, {
+          auth: { token },
+          withCredentials: true,
+          reconnection: true,
+          reconnectionAttempts: Infinity,
+          reconnectionDelay: 1000,
+        })
+      } else {
+        socket.auth = { token }
+        if (socket.disconnected) {
+          socket.connect()
         }
-        socket.off('connect')
-        socket.off('connect_error')
-        socket.disconnect()
       }
 
-      socket = io(SOCKET_URL, {
-        auth: {
-          token,
-        },
-        withCredentials: true,
-      })
-
-      socket._connectTimer = setTimeout(() => {
-        socket?.disconnect()
-        reject(new Error('Не удалось установить соединение с сервером'))
-      }, 10000)
-
-      socket.on('connect', () => {
+      const onConnect = () => {
+        console.log('[SOCKET] Подключено')
         if (socket?._connectTimer) {
           clearTimeout(socket._connectTimer)
           delete socket._connectTimer
         }
         resolve()
-      })
+      }
 
-      socket.on('connect_error', error => {
+      const onError = (error: Error) => {
         if (socket?._connectTimer) {
           clearTimeout(socket._connectTimer)
           delete socket._connectTimer
         }
         reject(new AppError(error.message))
-      })
+      }
+
+      socket.once('connect', onConnect)
+      socket.once('connect_error', onError)
+
+      socket._connectTimer = setTimeout(() => {
+        if (socket?.connected) return
+        reject(new Error('Не удалось установить соединение с сервером'))
+      }, 10000)
     })
   },
 
@@ -65,7 +70,6 @@ export const socketService = {
         delete socket._connectTimer
       }
       socket.disconnect()
-      socket = null
     }
   },
 
@@ -75,7 +79,7 @@ export const socketService = {
     }
   },
 
-  off: (event: string, callback?: (...args: unknown[]) => void): void => {
+  off: <T>(event: string, callback?: (data: T) => void): void => {
     if (socket) {
       socket.off(event, callback)
     }
@@ -90,6 +94,47 @@ export const socketService = {
       socket.emit(event, data, callback)
     } else {
       console.warn('Сокет не подключён')
+    }
+  },
+
+  connectWithFreshToken: async (): Promise<void> => {
+    const accessToken = tokenService.get()
+    if (!accessToken) {
+      throw new AppError('Нет токена для подключения')
+    }
+
+    const isExpired = checkIfTokenExpired(accessToken)
+    if (isExpired) {
+      console.log('[SOCKET] Токен истёк, обновляем...')
+
+      try {
+        const response = await apiFetch('/user/me')
+        const result = await response.json()
+
+        if (result.success) {
+          const newAccessToken = tokenService.get()
+
+          if (!newAccessToken || newAccessToken === accessToken) {
+            throw new AppError('Не удалось получить новый токен')
+          }
+
+          return socketService.connect(newAccessToken)
+        } else {
+          throw new AppError('Не удалось обновить токен')
+        }
+      } catch (error) {
+        console.error('[SOCKET] Не удалось обновить токен')
+
+        if (error instanceof AppError) throw error
+
+        throw new AppError('Не удалось обновить токен')
+      }
+    } else {
+      // Токен по дате валиден, но сервер отклонил
+      tokenService.remove()
+      throw new AppError(
+        'Токен отклонён сервером (возможно, сессия разлогинена)'
+      )
     }
   },
 }

@@ -1,10 +1,10 @@
-import { ROOM_EVENTS } from '../model/roomEvents'
 import {
   type JoinRoomRequest,
   type JoinRoomResponse,
   type LeaveRoomRequest,
   type LeaveRoomResponse,
 } from '../types'
+import { ROOM_EVENTS } from '../model/roomEvents'
 import { socketService } from '@/shared/api/socketService'
 import { AppError } from '@/shared/utils/errors'
 
@@ -20,8 +20,8 @@ export const roomService = {
           } else {
             reject(
               new AppError(
-                response.error?.message ||
-                  'При попытке войти в комнату возникла непредвиденная ошибка'
+                'При попытке войти в комнату возникла непредвиденная ошибка',
+                response.error?.message
               )
             )
           }
@@ -41,8 +41,8 @@ export const roomService = {
           } else {
             reject(
               new AppError(
-                response.error?.message ||
-                  'При выходе из комнаты возникла непредвиденная ошибка'
+                'При выходе из комнаты возникла непредвиденная ошибка',
+                response.error?.message
               )
             )
           }

@@ -4,40 +4,45 @@ import { RoomInfo, RoomSidebar } from '@/widgets/room'
 import { MessageList } from '@/widgets/message'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { SendMessageForm } from '@/features/message/sendMessage'
+import { useSessionStore } from '@/entities/session/model/sessionStore'
+import { useRoomListStore } from '@/entities/room/model/roomListStore'
 import { useRoomStore } from '@/entities/room/model/roomStore'
+import { usePresenceStore } from '@/entities/room/model/presenceStore'
 import { roomService } from '@/entities/room/lib/roomService'
 import { useRoomEvents } from '@/entities/room/lib/useRoomEvents'
 import { useMessagesStore } from '@/entities/message/model/messagesStore'
 import { useMessageEvents } from '@/entities/message/lib/useMessageEvents'
 import { useSocketStore } from '@/shared/store/socketStore'
-import { AppError } from '@/shared/utils/errors'
+import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import styles from './RoomPage.module.scss'
+import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 
 export const RoomPage = () => {
   const { roomId } = useParams()
-  const { isConnected } = useSocketStore()
-  const { currentRoom, setCurrentRoom } = useRoomStore()
-  const { setMessages } = useMessagesStore()
+  const isConnected = useSocketStore(state => state.isConnected)
+  const user = useSessionStore(state => state.user)
+  const currentRoom = useRoomStore(state => state.currentRoom)
   const { errorAlert } = useShowAlert()
+  const { goToProfile } = useAppNavigate()
 
   useRoomEvents()
   useMessageEvents()
 
   useEffect(() => {
-    if (!isConnected || !roomId) return
+    if (!roomId || !isConnected || !user) return
 
     const joinRoom = async () => {
       try {
-        const { room, messages } = await roomService.joinRoom(roomId)
+        const { room, messages, onlineUserIds } =
+          await roomService.joinRoom(roomId)
 
-        setCurrentRoom(room)
-        setMessages(messages)
+        useRoomListStore.getState().addRoom(room)
+        useRoomStore.getState().setCurrentRoom(room)
+        usePresenceStore.getState().setOnline(onlineUserIds)
+        useMessagesStore.getState().setMessages(messages)
       } catch (error) {
-        if (error instanceof AppError)
-          errorAlert(
-            `Ошибка при подключении к комнате: ${roomId}`,
-            error.message
-          )
+        goToProfile()
+        errorAlert(`Ошибка при подключении к комнате`, getErrorMessage(error))
       }
     }
 
@@ -48,8 +53,7 @@ export const RoomPage = () => {
         roomService.leaveRoom(roomId)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, roomId])
+  }, [roomId, isConnected, user])
 
   if (!currentRoom) {
     return <div>Загрузка комнаты...</div>

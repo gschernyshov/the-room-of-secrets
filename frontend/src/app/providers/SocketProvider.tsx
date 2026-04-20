@@ -3,9 +3,8 @@ import { useShowAlert } from '@/widgets/globalAlert'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { useSocketStore } from '@/shared/store/socketStore'
 import { socketService } from '@/shared/api/socketService'
-import { AppError } from '@/shared/utils/errors'
-import { roomService } from '@/entities/room/lib/roomService'
-import { useRoomStore } from '@/entities/room/model/roomStore'
+import { getErrorMessage } from '@/shared/utils/getErrorMessage'
+import { isErrorMessage } from '@/shared/utils/typeGuards'
 
 type Props = {
   children: ReactNode
@@ -13,68 +12,65 @@ type Props = {
 
 export const SocketProvider = ({ children }: Props) => {
   const accessToken = useSessionStore(state => state.accessToken)
-  const { errorAlert } = useShowAlert()
   const { setConnecting, setConnected, setDisconnected } = useSocketStore()
-  const currentRoom = useRoomStore(state => state.currentRoom)
+  const { errorAlert } = useShowAlert()
 
-  const connect = async () => {
-    if (!accessToken) return
-
-    setConnecting()
-    try {
-      await socketService.connect(accessToken)
+  useEffect(() => {
+    const handleConnect = () => {
+      console.log('[SocketProvider] Подключено')
       setConnected()
-    } catch (error) {
-      if (error instanceof AppError)
-        errorAlert('Ошибка подключения к серверу: ', error.message)
+    }
 
+    const handleDisconnect = (reason: string) => {
+      console.log('[SocketProvider] Отключено:', reason)
       setDisconnected()
     }
-  }
 
-  const disconnect = () => {
-    socketService.disconnect()
-    setDisconnected()
-  }
-
-  const restoreRooms = async () => {
-    if (currentRoom) roomService.joinRoom(currentRoom?.id)
-  }
-
-  useEffect(() => {
-    if (accessToken) {
-      connect()
-    } else {
-      disconnect()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken])
-
-  useEffect(() => {
-    //if (!socketService.socket) return
-
-    const onReconnect = () => {
-      console.log('Сокет переподключился, восстанавливаем комнаты...')
-      setConnected()
-      restoreRooms()
+    const handleConnectError = async (error: unknown) => {
+      if (
+        isErrorMessage(error) &&
+        error.message.includes('Требуется аутентификация')
+      ) {
+        setConnecting()
+        try {
+          await socketService.connectWithFreshToken()
+        } catch (error) {
+          errorAlert('Ошибка подключения к серверу: ', getErrorMessage(error))
+          setDisconnected()
+        }
+      }
     }
 
-    const onDisconnect = (...args: unknown[]) => {
-      const reason =
-        args.length > 0 && typeof args[0] === 'string' ? args[0] : 'unknown'
-      if (reason !== 'io client disconnect') {
+    socketService.on('connect', handleConnect)
+    socketService.on('connect_error', handleConnectError)
+    socketService.on('disconnect', handleDisconnect)
+
+    return () => {
+      socketService.off('connect', handleConnect)
+      socketService.off('connect_error', handleConnectError)
+      socketService.off('disconnect', handleDisconnect)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!accessToken) {
+      socketService.disconnect()
+      setDisconnected()
+      return
+    }
+
+    const connect = async () => {
+      setConnecting()
+      try {
+        await socketService.connect(accessToken)
+      } catch (error) {
+        errorAlert('Ошибка подключения к серверу: ', getErrorMessage(error))
         setDisconnected()
       }
     }
 
-    socketService.on('reconnect', onReconnect)
-    socketService.on('disconnect', onDisconnect)
-
-    return () => {
-      socketService?.off('reconnect', onReconnect)
-      socketService?.off('disconnect', onDisconnect)
-    }
-  }, [setConnected, setDisconnected])
+    connect()
+  }, [accessToken])
 
   return <>{children}</>
 }
