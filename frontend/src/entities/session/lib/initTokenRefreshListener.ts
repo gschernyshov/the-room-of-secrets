@@ -1,8 +1,12 @@
+import { setOnTokenRefreshed } from '@/shared/auth/lib/tokenService'
 import { useSessionStore } from '../model/sessionStore'
-import { setOnTokenRefreshed } from '@/shared/api/apiFetch'
 
 export const initTokenRefreshListener = () => {
   setOnTokenRefreshed(newToken => {
+    if (newToken === null) {
+      useSessionStore.getState().logout()
+    }
+
     useSessionStore.getState().setToken(newToken)
   })
 }

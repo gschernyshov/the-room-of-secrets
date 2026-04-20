@@ -1,20 +1,22 @@
+import { tokenService } from '../auth/lib/tokenService'
 import { AppError } from '../utils/errors'
 
 const API_URL = import.meta.env.VITE_API_URL
-const REFRESH_TIMEOUT = 10_000
+const REFRESH_TIMEOUT = 10_000 // Таймаут для запроса обновления токена (10 сек)
 
+// Флаг, указывающий, идёт ли сейчас обновление токена
 let isRefreshing = false
+
+// Очередь запросов, заблокированных из-за 401, которые будут перезапущены после обновления токена
 let failedQueue: Array<{
   reject: (error: AppError) => void
   resolve: () => void
 }> = []
 
-let onTokenRefreshed: ((token: string) => void) | null = null
-
-export const setOnTokenRefreshed = (callback: (token: string) => void) => {
-  onTokenRefreshed = callback
-}
-
+/**
+ * Обрабатывает очередь ожидающих запросов
+ * Вызывает resolve() для успешного продолжения или reject(error) при ошибке
+ */
 const processQueue = (error: AppError | null) => {
   failedQueue.forEach(promise => {
     if (error) {
@@ -26,6 +28,10 @@ const processQueue = (error: AppError | null) => {
   failedQueue = []
 }
 
+/**
+ * Асинхронная функция для выполнения HTTP-запроса с автоматическим обновлением токена
+ * Поддерживает проброс signal для отмены запроса
+ */
 export const apiFetch = async (
   url: RequestInfo,
   init?: RequestInit
@@ -33,25 +39,31 @@ export const apiFetch = async (
   const controller = new AbortController()
   const signal = controller.signal
 
+  // Сохраняем оригинальный signal из init, если есть
   const originalSignal = init?.signal
 
   if (originalSignal) {
     const onAbort = () => controller.abort()
 
+    // Если внешний запрос был отменён — отменяем и наш контроллер
     originalSignal.addEventListener('abort', onAbort)
 
+    // Очищаем слушатель при завершении нашего запроса
     signal.addEventListener('abort', () => {
       originalSignal.removeEventListener('abort', onAbort)
     })
   }
 
+  // Формируем заголовки
   const headers = new Headers(init?.headers)
 
-  const accessToken = localStorage.getItem('accessToken')
+  // Добавляем Authorization, если есть токен
+  const accessToken = tokenService.get()
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`)
   }
 
+  // Создаём объект запроса с нужным URL, методом, заголовками и сигналом
   const request = new Request(`${API_URL}${url}`, {
     ...init,
     headers,
@@ -68,6 +80,7 @@ export const apiFetch = async (
     throw new AppError('Возникла ошибка сети. Проверьте подключение')
   }
 
+  // Если статус не 401 — возвращаем ответ как есть
   if (response.status !== 401) {
     return response
   } else {
@@ -81,10 +94,13 @@ export const apiFetch = async (
       throw new AppError('Не удалось распарсить тело ответа сервера')
     }
 
+    // Если ошибка не связана с аутентификацией (например, 401 c AUTH_FAILED, при вводе
+    // неправильных данных (на странице входа)) — возвращаем как есть
     if (errorResult?.error?.type === 'AUTH_FAILED') {
       return response
     }
 
+    // Если уже идёт обновление токена — ставим запрос в очередь
     if (isRefreshing) {
       return new Promise<Response>((resolve, reject) => {
         failedQueue.push({
@@ -94,6 +110,7 @@ export const apiFetch = async (
       })
     }
 
+    // Начинаем процесс обновления токена
     isRefreshing = true
 
     const refreshController = new AbortController()
@@ -104,7 +121,7 @@ export const apiFetch = async (
     try {
       const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // Важно для отправки HTTP-only cookies
         headers: { 'Content-Type': 'application/json' },
         signal: refreshController.signal,
       })
@@ -114,10 +131,10 @@ export const apiFetch = async (
       if (refreshResult.success) {
         const { newAccessToken } = refreshResult.data
 
-        if (onTokenRefreshed) {
-          onTokenRefreshed(newAccessToken)
-        }
+        // Сохраняем новый токен (вызовет колбэк для установки токена в SessionStore через tokenService.set)
+        tokenService.set(newAccessToken)
 
+        // Повторяем оригинальный запрос с новым токеном
         const retryHeaders = new Headers(init?.headers)
         retryHeaders.set('Authorization', `Bearer ${newAccessToken}`)
 
@@ -129,6 +146,7 @@ export const apiFetch = async (
 
         const retryResponse = await fetch(retryRequest)
 
+        // Успешно обновили — разрешаем все запросы в очереди
         processQueue(null)
 
         return retryResponse
@@ -144,8 +162,11 @@ export const apiFetch = async (
           ? error
           : new AppError('При обновлении сессии возникла ошибка')
 
+      // Уведомляем все запросы в очереди об ошибке
       processQueue(appError)
-      localStorage.removeItem('accessToken')
+
+      // Удаляем токен — пользователь больше не аутентифицирован
+      tokenService.remove()
 
       throw appError
     } finally {

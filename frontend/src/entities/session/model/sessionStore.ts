@@ -18,7 +18,7 @@ type SessionActions = {
   login: (token: string, user: User) => void
   logout: () => void
   updateUser: (user: Partial<User>) => void
-  setToken: (token: string) => void
+  setToken: (token: string | null) => void
   init: () => Promise<void>
 }
 
@@ -30,12 +30,12 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
 
   login: (token, user) => {
     tokenService.set(token)
-    set({ status: 'authenticated', accessToken: token, user })
+    set({ status: 'authenticated', user })
   },
 
   logout: () => {
     tokenService.remove()
-    set({ status: 'unauthenticated', accessToken: null, user: null })
+    set({ status: 'unauthenticated', user: null })
   },
 
   updateUser: user =>
@@ -44,7 +44,7 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
       return { user: { ...state.user, ...user } }
     }),
 
-  setToken: token => (set({ accessToken: token }), tokenService.set(token)),
+  setToken: token => set({ accessToken: token }),
 
   init: async () => {
     const token = tokenService.get()
@@ -80,7 +80,6 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
 
       set({
         status: 'unauthenticated',
-        accessToken: null,
         user: null,
         error: messageError,
       })

@@ -114,7 +114,7 @@ export const socketService = {
         if (result.success) {
           const newAccessToken = tokenService.get()
 
-          if (!newAccessToken || newAccessToken === accessToken) {
+          if (!newAccessToken) {
             throw new AppError('Не удалось получить новый токен')
           }
 
