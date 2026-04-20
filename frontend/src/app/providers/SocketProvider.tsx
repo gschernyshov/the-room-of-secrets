@@ -70,7 +70,10 @@ export const SocketProvider = ({ children }: Props) => {
     const handleVisibilityChange = () => {
       if (!document.hidden && accessToken) {
         setConnecting()
-        socketService.connect(accessToken).catch(() => {})
+        socketService
+          .connect(accessToken)
+          .then(() => setConnected())
+          .catch(() => {})
       }
     }
 
