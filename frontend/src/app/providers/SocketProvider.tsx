@@ -35,7 +35,7 @@ export const SocketProvider = ({ children }: Props) => {
 
     const handleDisconnect = (reason: string) => {
       console.log('[SOCKET_PROVIDER] Отключено: ', reason)
-      successAlert('Подключение к серверу', 'Вы отключились от сервера')
+      errorAlert('Подключение к серверу', 'Вы отключились от сервера')
       setDisconnected()
     }
 
@@ -64,7 +64,7 @@ export const SocketProvider = ({ children }: Props) => {
       socketService.off('connect_error', handleConnectError)
       socketService.off('disconnect', handleDisconnect)
     }
-  }, [])
+  }, [accessToken])
 
   useEffect(() => {
     const handleVisibilityChange = () => {

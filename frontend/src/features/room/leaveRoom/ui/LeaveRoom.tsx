@@ -14,7 +14,7 @@ export const LeaveRoom = ({ roomId }: Props) => {
 
   const handleLeaveRoom = async () => {
     try {
-      leaveRoom(roomId)
+      await leaveRoom(roomId)
     } catch (error) {
       errorAlert('Ошибка при выходе из комнаты', getErrorMessage(error))
     }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
+import { tokenService } from '@/shared/auth/lib/tokenService'
 import { apiFetch } from '@/shared/api/apiFetch'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 import { AppError } from '@/shared/utils/errors'
@@ -21,6 +22,7 @@ export const useLogout = () => {
       const result = await response.json()
 
       if (result.success) {
+        tokenService.cleanRemove()
         useSessionStore.getState().logout()
 
         goToHome()

@@ -11,6 +11,14 @@ export const tokenService = {
     return localStorage.getItem('accessToken')
   },
 
+  cleanSet: (token: string): void => {
+    localStorage.setItem('accessToken', token)
+  },
+
+  cleanRemove: (): void => {
+    localStorage.removeItem('accessToken')
+  },
+
   set: (token: string): void => {
     localStorage.setItem('accessToken', token)
     if (onTokenRefreshed) onTokenRefreshed(token)

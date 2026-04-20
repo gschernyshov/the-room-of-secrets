@@ -29,13 +29,11 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
   error: null,
 
   login: (token, user) => {
-    tokenService.set(token)
-    set({ status: 'authenticated', user })
+    set({ status: 'authenticated', accessToken: token, user })
   },
 
   logout: () => {
-    tokenService.remove()
-    set({ status: 'unauthenticated', user: null })
+    set({ status: 'unauthenticated', accessToken: null, user: null })
   },
 
   updateUser: user =>
@@ -44,7 +42,12 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
       return { user: { ...state.user, ...user } }
     }),
 
-  setToken: token => set({ accessToken: token }),
+  setToken: token =>
+    set(
+      token
+        ? { accessToken: token }
+        : { status: 'unauthenticated', accessToken: null, user: null }
+    ),
 
   init: async () => {
     const token = tokenService.get()
@@ -76,10 +79,11 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
           'При аутентификации пользователя возникала непредвиденная ошибка'
       }
 
-      tokenService.remove()
+      tokenService.cleanRemove()
 
       set({
         status: 'unauthenticated',
+        accessToken: null,
         user: null,
         error: messageError,
       })

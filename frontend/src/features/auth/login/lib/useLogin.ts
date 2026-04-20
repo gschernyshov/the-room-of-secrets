@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom'
 import { type LoginFormData } from './loginSchema'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
+import { tokenService } from '@/shared/auth/lib/tokenService'
 import { apiFetch } from '@/shared/api/apiFetch'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 import { AppError } from '@/shared/utils/errors'
@@ -25,6 +26,7 @@ export const useLogin = () => {
       if (result.success) {
         const { accessToken, user } = result.data
 
+        tokenService.cleanSet(accessToken)
         useSessionStore.getState().login(accessToken, user)
 
         const from = state?.from?.pathname || AppRoutes.HOME

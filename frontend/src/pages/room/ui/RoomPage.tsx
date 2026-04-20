@@ -25,9 +25,6 @@ export const RoomPage = () => {
   const { errorAlert } = useShowAlert()
   const { goToProfile } = useAppNavigate()
 
-  console.log('isConnecting', isConnecting)
-  console.log('isConnected', isConnected)
-
   useRoomEvents()
   useMessageEvents()
 

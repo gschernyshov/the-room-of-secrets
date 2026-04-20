@@ -1,9 +1,9 @@
 import { io, type Socket } from 'socket.io-client'
+import { apiFetch } from './apiFetch'
+import { tokenService } from '../auth/lib/tokenService'
+import { checkIfTokenExpired } from '../utils/jwt'
 import { AppError } from '../utils/errors'
 import { type SocketCallback } from '../types/socket.types'
-import { apiFetch } from './apiFetch'
-import { checkIfTokenExpired } from '../utils/jwt'
-import { tokenService } from '../auth/lib/tokenService'
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:8000'
 
