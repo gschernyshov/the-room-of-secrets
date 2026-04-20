@@ -25,6 +25,9 @@ export const RoomPage = () => {
   const { errorAlert } = useShowAlert()
   const { goToProfile } = useAppNavigate()
 
+  console.log('isConnecting', isConnecting)
+  console.log('isConnected', isConnected)
+
   useRoomEvents()
   useMessageEvents()
 
@@ -55,7 +58,7 @@ export const RoomPage = () => {
     }
   }, [roomId, isConnected, user])
 
-  if (!isConnecting || !currentRoom) {
+  if (isConnecting || !currentRoom) {
     return <div>Загрузка комнаты...</div>
   }
 
