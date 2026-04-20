@@ -24,6 +24,7 @@ export const SocketProvider = ({ children }: Props) => {
 
     setConnecting()
     socketService.connect(accessToken).catch(() => {})
+    setConnected()
   }, [accessToken])
 
   useEffect(() => {
