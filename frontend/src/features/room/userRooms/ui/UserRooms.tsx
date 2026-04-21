@@ -7,7 +7,7 @@ export const UserRooms = () => {
   const { isLoading, rooms, error } = useRoomListStore()
 
   if (isLoading) {
-    return <Loader />
+    return <Loader size="s" />
   }
 
   if (error) {

@@ -1,7 +1,8 @@
 import { useEffect, type ReactNode } from 'react'
+import { useShowAlert } from '@/widgets/globalAlert'
 import { useInitAuth } from '@/entities/session/model/useInitAuth'
 import { initTokenRefreshListener } from '@/entities/session/lib/initTokenRefreshListener'
-import { useShowAlert } from '@/widgets/globalAlert'
+import { Loader } from '@/shared/ui/Loader'
 
 type Props = {
   children: ReactNode
@@ -22,7 +23,11 @@ export const AuthProvider = ({ children }: Props) => {
   }, [])
 
   if (status === 'loading') {
-    return <div>Загрузка...</div>
+    return (
+      <div style={{ height: '100vh', width: '100vw' }}>
+        <Loader size="l" />
+      </div>
+    )
   }
 
   return <>{children}</>

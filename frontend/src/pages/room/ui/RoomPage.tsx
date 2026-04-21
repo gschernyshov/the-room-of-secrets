@@ -12,6 +12,7 @@ import { roomService } from '@/entities/room/lib/roomService'
 import { useRoomEvents } from '@/entities/room/lib/useRoomEvents'
 import { useMessagesStore } from '@/entities/message/model/messagesStore'
 import { useMessageEvents } from '@/entities/message/lib/useMessageEvents'
+import { Loader } from '@/shared/ui/Loader'
 import { useSocketStore } from '@/shared/store/socketStore'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import styles from './RoomPage.module.scss'
@@ -56,7 +57,7 @@ export const RoomPage = () => {
   }, [roomId, isConnected, user])
 
   if (isConnecting || !currentRoom) {
-    return <div>Загрузка комнаты...</div>
+    return <Loader size="m" />
   }
 
   return (
