@@ -13,6 +13,20 @@
     cursor: pointer;
   }
 
+  &__avatar {
+    &--loading {
+      border: 2px solid orange;
+    }
+
+    &--active {
+      border: 2px solid green;
+    }
+
+    &--passive {
+      border: 2px solid red;
+    }
+  }
+
   &__info {
     display: flex;
     flex-direction: column;
