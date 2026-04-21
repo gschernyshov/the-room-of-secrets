@@ -35,22 +35,40 @@ class RoomRepository {
   async join(roomId: Room['id'], userId: User['id']): Promise<Room | null> {
     const [room] = await db.query<Room>(
       `
-        -- Добавляем участника в комнату, только если его ещё нет:
-        -- Проверяем через NOT EXISTS, не существует ли уже элемент с таким userId в массиве participants
-        -- Если пользователь уже есть — запрос ничего не делает (пропускаем UPDATE)
-        -- Если нет — добавляем нового участника в формате JSONB с полями: userId и status
-        -- Возвращаем комнату ТОЛЬКО ЕСЛИ участник был добавлен (если до этого его не было)
-        UPDATE rooms
-        SET participants = participants || jsonb_build_array(
-          jsonb_build_object('userId', $2::int, 'status', 'active')
-        )
-        WHERE id = $1
-          AND NOT EXISTS (
-            SELECT 1
-            FROM jsonb_array_elements(participants) AS elem
-            WHERE (elem->>'userId')::int = $2
+        -- Присоединяем пользователя или обновляем его статус на 'active'
+        -- Используем jsonb_agg для пересборки массива participants
+        
+        WITH modify_participants AS (
+          -- Обновляем или добавляем пользователя в participants
+          UPDATE rooms
+          SET participants = (
+            SELECT jsonb_agg(
+              CASE
+                -- Если пользователь уже есть, то обновляем статус на 'active', если был 'left'
+                WHEN (elem->>'userId')::int = $2 THEN
+                  jsonb_set(elem, '{status}', '"active"')
+                ELSE
+                  elem
+              END
+            )
+            FROM jsonb_array_elements(
+              -- Если пользователя нет вообще, то добавляем его перед агрегацией
+              participants || 
+              CASE
+                WHEN NOT EXISTS (
+                  SELECT 1 FROM jsonb_array_elements(participants) AS elem 
+                  WHERE (elem->>'userId')::int = $2
+                ) THEN
+                  jsonb_build_array(jsonb_build_object('userId', $2, 'status', 'active'))
+                ELSE
+                  '[]'::jsonb
+              END
+            ) AS elem
           )
-        RETURNING id, name, participants, created_at AS "createdAt";
+          WHERE id = $1
+          RETURNING id, name, participants, created_at AS "createdAt"
+        )
+        SELECT * FROM modify_participants;
       `,
       [roomId, userId]
     )
