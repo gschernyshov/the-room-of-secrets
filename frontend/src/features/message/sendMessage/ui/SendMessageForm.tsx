@@ -2,24 +2,26 @@ import { useState, type SubmitEvent } from 'react'
 import { TextInput, Button } from '@gravity-ui/uikit'
 import { useSendMessage } from '../lib/useSendMessage'
 import { useShowAlert } from '@/widgets/globalAlert'
-import { AppError } from '@/shared/utils/errors'
+import { useRoomStore } from '@/entities/room/model/roomStore'
+import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import styles from './SendMessageForm.module.scss'
 
 export const SendMessageForm = () => {
+  const { currentRoom } = useRoomStore()
   const { errorAlert } = useShowAlert()
-  const { isLoading, sendMessage } = useSendMessage()
+  const { isLoading, sendMessage } = useSendMessage(currentRoom?.id)
   const [newMessage, setNewMessage] = useState('')
 
   const handleSubmit = async (e: SubmitEvent<HTMLElement>) => {
     e.preventDefault()
 
+    if (isLoading) return
+
     try {
       await sendMessage(newMessage)
-
       setNewMessage('')
     } catch (error) {
-      if (error instanceof AppError)
-        errorAlert('Ошибка отправки сообщения', error.message)
+      errorAlert('Ошибка отправки сообщения', getErrorMessage(error))
     }
   }
 

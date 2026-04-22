@@ -1,10 +1,10 @@
+import { ROOM_EVENTS } from '../model/roomEvents'
 import {
   type JoinRoomRequest,
   type JoinRoomResponse,
   type LeaveRoomRequest,
   type LeaveRoomResponse,
 } from '../types'
-import { ROOM_EVENTS } from '../model/roomEvents'
 import { socketService } from '@/shared/api/socketService'
 import { AppError } from '@/shared/utils/errors'
 

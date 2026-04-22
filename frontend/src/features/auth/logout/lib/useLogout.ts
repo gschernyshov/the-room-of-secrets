@@ -2,11 +2,9 @@ import { useState } from 'react'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { tokenService } from '@/shared/auth/lib/tokenService'
 import { apiFetch } from '@/shared/api/apiFetch'
-import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 import { AppError } from '@/shared/utils/errors'
 
 export const useLogout = () => {
-  const { goToHome } = useAppNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleLogout = async () => {
@@ -24,8 +22,6 @@ export const useLogout = () => {
       if (result.success) {
         tokenService.cleanRemove()
         useSessionStore.getState().logout()
-
-        goToHome()
       } else {
         throw new AppError(
           'При выходе из системы возникла непредвиденная ошибка',

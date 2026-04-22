@@ -2,10 +2,10 @@ import { useLocation } from 'react-router-dom'
 import { type LoginFormData } from './loginSchema'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { tokenService } from '@/shared/auth/lib/tokenService'
-import { apiFetch } from '@/shared/api/apiFetch'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
+import { apiFetch } from '@/shared/api/apiFetch'
 import { AppError } from '@/shared/utils/errors'
-import { AppRoutes } from '@/shared/consts/router'
+import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
 export const useLogin = () => {
   const { navigate } = useAppNavigate()
@@ -29,7 +29,7 @@ export const useLogin = () => {
         tokenService.cleanSet(accessToken)
         useSessionStore.getState().login(accessToken, user)
 
-        const from = state?.from?.pathname || AppRoutes.HOME
+        const from = state?.from || RoutePath[AppRoutes.PROFILE]
         navigate(from, { replace: true })
       } else {
         throw new AppError(

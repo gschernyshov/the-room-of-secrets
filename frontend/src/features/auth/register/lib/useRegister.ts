@@ -1,10 +1,11 @@
 import { useLocation } from 'react-router-dom'
 import { type RegisterFormData } from './registerSchema'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
-import { apiFetch } from '@/shared/api/apiFetch'
+import { tokenService } from '@/shared/auth/lib/tokenService'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
+import { apiFetch } from '@/shared/api/apiFetch'
 import { AppError } from '@/shared/utils/errors'
-import { AppRoutes } from '@/shared/consts/router'
+import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
 export const useRegister = () => {
   const { navigate } = useAppNavigate()
@@ -25,9 +26,10 @@ export const useRegister = () => {
       if (result.success) {
         const { accessToken, user } = result.data
 
+        tokenService.cleanSet(accessToken)
         useSessionStore.getState().login(accessToken, user)
 
-        const from = state?.from?.pathname || AppRoutes.HOME
+        const from = state?.from || RoutePath[AppRoutes.PROFILE]
         navigate(from, { replace: true })
       } else {
         throw new AppError(

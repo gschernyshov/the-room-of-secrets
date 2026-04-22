@@ -1,19 +1,18 @@
 import { useState } from 'react'
 import { messageService } from '@/entities/message/lib/messageService'
-import { useRoomStore } from '@/entities/room/model/roomStore'
 import { type Message } from '@/entities/message/types'
 import { AppError } from '@/shared/utils/errors'
+import type { Room } from '@/entities/room/types'
 
-export const useSendMessage = () => {
-  const { currentRoom } = useRoomStore()
+export const useSendMessage = (roomId: Room['id'] | undefined) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const sendMessage = async (newMessage: Message['content']) => {
-    if (!currentRoom || !newMessage.trim()) return
+    if (isLoading || !roomId || !newMessage.trim()) return
 
     setIsLoading(true)
     try {
-      await messageService.sendMessage(currentRoom.id, newMessage)
+      await messageService.sendMessage(roomId, newMessage)
     } catch (error) {
       if (error instanceof AppError) throw error
 

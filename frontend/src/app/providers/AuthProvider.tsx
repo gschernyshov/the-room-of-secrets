@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { useShowAlert } from '@/widgets/globalAlert'
-import { useInitAuth } from '@/entities/session/model/useInitAuth'
+import { useSessionStore } from '@/entities/session/model/sessionStore'
+import { useRoomListStore } from '@/entities/room/model/roomListStore'
 import { initTokenRefreshListener } from '@/entities/session/lib/initTokenRefreshListener'
 import { Loader } from '@/shared/ui/Loader'
 
@@ -9,14 +10,34 @@ type Props = {
 }
 
 export const AuthProvider = ({ children }: Props) => {
-  const { status, error } = useInitAuth()
   const { errorAlert } = useShowAlert()
+  const { status, error: errorSessionStore, user } = useSessionStore()
+  const { error: errorRoomListStore } = useRoomListStore()
 
   useEffect(() => {
-    if (error) {
-      errorAlert('Ошибка', error)
+    if (status === 'loading') {
+      useSessionStore.getState().init()
     }
-  }, [error, errorAlert])
+  }, [status])
+
+  useEffect(() => {
+    if (status === 'authenticated' && user) {
+      useRoomListStore.getState().loadUserRooms(user.id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, user?.id])
+
+  useEffect(() => {
+    if (errorSessionStore)
+      errorAlert('Ошибка аутентификации', errorSessionStore)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errorSessionStore])
+
+  useEffect(() => {
+    if (errorRoomListStore)
+      errorAlert('Ошибка загрузки комнат', errorRoomListStore)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errorRoomListStore])
 
   useEffect(() => {
     initTokenRefreshListener()

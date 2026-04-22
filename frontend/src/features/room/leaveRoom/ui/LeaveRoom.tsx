@@ -13,6 +13,8 @@ export const LeaveRoom = ({ roomId }: Props) => {
   const { errorAlert } = useShowAlert()
 
   const handleLeaveRoom = async () => {
+    if (isLoading) return
+
     try {
       await leaveRoom(roomId)
     } catch (error) {

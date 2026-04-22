@@ -13,8 +13,8 @@ type RoomListState = {
 
 type RoomListActions = {
   removeRoom: (roomId: Room['id']) => void
-  loadUserRooms: (userId: User['id']) => Promise<void>
   addRoom: (room: Room) => void
+  loadUserRooms: (userId: User['id']) => Promise<void>
 }
 
 export const useRoomListStore = create<RoomListState & RoomListActions>(

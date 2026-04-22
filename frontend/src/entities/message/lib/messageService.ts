@@ -23,8 +23,8 @@ export const messageService = {
           } else {
             reject(
               new AppError(
-                response.error?.message ||
-                  'При отправке сообщения возникла непредвиденная ошибка'
+                'При отправке сообщения возникла непредвиденная ошибка',
+                response.error?.message
               )
             )
           }

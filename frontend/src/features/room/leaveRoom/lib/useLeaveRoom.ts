@@ -8,6 +8,8 @@ export const useLeaveRoom = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const leaveRoom = async (id: Room['id']) => {
+    if (isLoading) return
+
     setIsLoading(true)
     try {
       const response = await apiFetch('/room/leave', {

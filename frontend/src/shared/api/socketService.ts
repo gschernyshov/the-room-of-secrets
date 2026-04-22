@@ -7,11 +7,7 @@ import { type SocketCallback } from '../types/socket.types'
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:8000'
 
-type SocketWithTimer = Socket & {
-  _connectTimer?: ReturnType<typeof setTimeout>
-}
-
-let socket: SocketWithTimer | null = null
+let socket: Socket | null = null
 
 export const socketService = {
   connect: (token: string): Promise<void> => {
@@ -81,7 +77,7 @@ export const socketService = {
     if (socket) {
       socket.emit(event, data, callback)
     } else {
-      console.warn('Сокет не подключён')
+      console.warn('[SOCKET_SERVICE] Сокет не подключён')
     }
   },
 

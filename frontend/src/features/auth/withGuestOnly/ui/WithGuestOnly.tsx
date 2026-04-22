@@ -7,10 +7,15 @@ type Props = {
   redirectTo?: string
 }
 
+/**
+ * Разрешает доступ только неавторизованным пользователям.
+ * Использует getState(), так как реактивность не нужна —
+ * авторизованный пользователь не должен попадать на эти страницы.
+ * Это предотвращает конфликты редиректов и даёт страницам
+ * самим управлять переходом после входа (через location.state.from).
+ */
 export const WithGuestOnly = ({ children, redirectTo = '/profile' }: Props) => {
-  const status = useSessionStore(state => state.status)
-
-  if (status === 'authenticated') {
+  if (useSessionStore.getState().status === 'authenticated') {
     return <AppNavigate to={redirectTo} replace />
   }
 

@@ -17,8 +17,11 @@ export const CreateRoomForm = ({ onPopupOpen }: Props) => {
   const handleSubmit = async (e: SubmitEvent<HTMLElement>) => {
     e.preventDefault()
 
+    if (isLoading) return
+
     try {
       await createRoom(nameRoom)
+      setNameRoom('')
 
       onPopupOpen(false)
     } catch (error) {

@@ -1,8 +1,8 @@
-import { type FC, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { routeConfig } from '../routes'
 
-export const RouteTitleSetter: FC = () => {
+export const RouteTitleSetter = () => {
   const location = useLocation()
 
   useEffect(() => {

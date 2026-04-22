@@ -80,11 +80,8 @@ export const createHandleFormErrors = <T extends FieldValues>(
   }
 }
 
-/*
-Примеры ошибок с сервера:
-
-1.
-
+/**
+* Примеры ошибок с сервера:
 {
   "success": false,
   "error": {
@@ -106,9 +103,7 @@ export const createHandleFormErrors = <T extends FieldValues>(
     ]
   }
 }
-
-2.
-
+* или
 {
   success: false,
   error: {

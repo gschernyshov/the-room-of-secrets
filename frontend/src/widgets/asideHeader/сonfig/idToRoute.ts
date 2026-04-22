@@ -1,6 +1,6 @@
-import { AppRoutes } from '@/shared/consts/router'
+import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
 export const ID_TO_ROUTE: Record<string, string> = {
-  login: AppRoutes.LOGIN,
-  register: AppRoutes.REGISTER,
+  login: RoutePath[AppRoutes.LOGIN],
+  register: RoutePath[AppRoutes.REGISTER],
 }
