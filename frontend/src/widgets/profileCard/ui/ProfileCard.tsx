@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { Avatar } from '@gravity-ui/uikit'
-import { TABS } from '../model/tab'
+import { TAB_CONFIG, TABS } from '../model/tab'
 import { useProfileCardStore } from '../model/profileCardStore'
 import { useInitProfileStore } from '../lib/useInitProfileStore'
 import { ChangeInfo } from '@/features/user/changeInfo'
@@ -8,12 +8,15 @@ import { ChangePassword } from '@/features/user/changePassword'
 import { UserRooms } from '@/features/room/userRooms'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import styles from './ProfileCard.module.scss'
+import { usePageTitle } from '@/shared/lib/hooks/usePageTitle'
 
 export const ProfileCard = () => {
   useInitProfileStore()
 
   const { user } = useSessionStore()
   const { activeTab, setActiveTab } = useProfileCardStore()
+
+  usePageTitle(`Личный кабинет / ${TAB_CONFIG[activeTab]}`)
 
   return (
     <div className={styles['profile-card']}>

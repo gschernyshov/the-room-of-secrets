@@ -9,8 +9,13 @@ import { WithAuthRequire } from '@/features/auth/withAuthRequire/ui/WithAuthRequ
 import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
 export const routeConfig = [
-  { path: AppRoutes.HOME, element: <HomePage /> },
   {
+    title: 'Главная «The Room of Secrets»',
+    path: AppRoutes.HOME,
+    element: <HomePage />,
+  },
+  {
+    title: 'Вход в «The Room of Secrets»',
     path: AppRoutes.LOGIN,
     element: (
       <WithGuestOnly>
@@ -19,6 +24,7 @@ export const routeConfig = [
     ),
   },
   {
+    title: 'Регистрация в «The Room of Secrets»',
     path: AppRoutes.REGISTER,
     element: (
       <WithGuestOnly>
@@ -27,6 +33,7 @@ export const routeConfig = [
     ),
   },
   {
+    title: 'Профиль',
     path: AppRoutes.PROFILE,
     element: (
       <WithAuthRequire>
@@ -35,6 +42,7 @@ export const routeConfig = [
     ),
   },
   {
+    title: 'Комната',
     path: AppRoutes.ROOM,
     element: (
       <WithAuthRequire>
@@ -43,6 +51,7 @@ export const routeConfig = [
     ),
   },
   {
+    title: 'Комната',
     path: RoutePath[AppRoutes.ROOM],
     element: (
       <WithAuthRequire>

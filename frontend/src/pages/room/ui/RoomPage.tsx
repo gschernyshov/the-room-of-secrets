@@ -3,8 +3,6 @@ import { useParams } from 'react-router-dom'
 import { RoomInfo, RoomSidebar } from '@/widgets/room'
 import { MessageList } from '@/widgets/message'
 import { useShowAlert } from '@/widgets/globalAlert'
-import { SendMessageForm } from '@/features/message/sendMessage'
-import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { useRoomListStore } from '@/entities/room/model/roomListStore'
 import { useRoomStore } from '@/entities/room/model/roomStore'
 import { usePresenceStore } from '@/entities/room/model/presenceStore'
@@ -12,25 +10,30 @@ import { roomService } from '@/entities/room/lib/roomService'
 import { useRoomEvents } from '@/entities/room/lib/useRoomEvents'
 import { useMessagesStore } from '@/entities/message/model/messagesStore'
 import { useMessageEvents } from '@/entities/message/lib/useMessageEvents'
-import { Loader } from '@/shared/ui/Loader'
+import { SendMessageForm } from '@/features/message/sendMessage'
 import { useSocketStore } from '@/shared/store/socketStore'
+import { usePageTitle } from '@/shared/lib/hooks/usePageTitle'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
-import styles from './RoomPage.module.scss'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
+import { AppNavigate } from '@/shared/lib/router/AppNavigate'
+import { AppRoutes } from '@/shared/consts/router'
+import { Loader } from '@/shared/ui/Loader'
+import styles from './RoomPage.module.scss'
 
 export const RoomPage = () => {
   const { roomId } = useParams()
-  const { isConnecting, isConnected } = useSocketStore()
-  const user = useSessionStore(state => state.user)
   const currentRoom = useRoomStore(state => state.currentRoom)
-  const { errorAlert } = useShowAlert()
+  const { isConnecting, isConnected } = useSocketStore()
   const { goToProfile } = useAppNavigate()
+  const { errorAlert } = useShowAlert()
 
   useRoomEvents()
   useMessageEvents()
 
+  usePageTitle(`Комната: «${roomId}»`)
+
   useEffect(() => {
-    if (!roomId || !isConnected || !user) return
+    if (!roomId || !isConnected) return
 
     const joinRoom = async () => {
       try {
@@ -52,9 +55,16 @@ export const RoomPage = () => {
     return () => {
       if (roomId) {
         roomService.leaveRoom(roomId)
+
+        useRoomStore.getState().clear()
+        usePresenceStore.getState().clear()
+        useMessagesStore.getState().clear()
       }
     }
-  }, [roomId, isConnected, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId, isConnected])
+
+  if (!roomId) return <AppNavigate replace={true} to={AppRoutes.PROFILE} />
 
   if (isConnecting || !currentRoom) {
     return <Loader size="m" />
