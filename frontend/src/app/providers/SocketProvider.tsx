@@ -23,21 +23,29 @@ export const SocketProvider = ({ children }: Props) => {
     }
 
     setConnecting()
-    socketService.connect(accessToken).catch(() => {})
-    setConnected()
+    socketService
+      .connect(accessToken)
+      .then(() => {
+        setConnected()
+      })
+      .catch(() => {})
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken])
 
   useEffect(() => {
     const handleConnect = () => {
+      setConnected()
+
       console.log('[SOCKET_PROVIDER] Подключено')
       successAlert('Подключение к серверу', 'Вы успешно подключились к серверу')
-      setConnected()
     }
 
     const handleDisconnect = (reason: string) => {
+      setDisconnected()
+
       console.log('[SOCKET_PROVIDER] Отключено: ', reason)
       errorAlert('Подключение к серверу', 'Вы отключились от сервера')
-      setDisconnected()
     }
 
     const handleConnectError = async (error: Error) => {
@@ -65,6 +73,7 @@ export const SocketProvider = ({ children }: Props) => {
       socketService.off('connect_error', handleConnectError)
       socketService.off('disconnect', handleDisconnect)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken])
 
   useEffect(() => {
@@ -73,7 +82,9 @@ export const SocketProvider = ({ children }: Props) => {
         setConnecting()
         socketService
           .connect(accessToken)
-          .then(() => setConnected())
+          .then(() => {
+            setConnected()
+          })
           .catch(() => {})
       }
     }
@@ -82,6 +93,7 @@ export const SocketProvider = ({ children }: Props) => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken])
 
   return <>{children}</>
