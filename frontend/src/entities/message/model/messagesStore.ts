@@ -8,6 +8,7 @@ type MessagesState = {
 type MessagesActions = {
   addMessage: (message: Message) => void
   setMessages: (messages: Message[]) => void
+  clear: () => void
 }
 
 export const useMessagesStore = create<MessagesState & MessagesActions>(
@@ -18,5 +19,7 @@ export const useMessagesStore = create<MessagesState & MessagesActions>(
       set(state => ({ messages: [...state.messages, message] })),
 
     setMessages: messages => set({ messages }),
+
+    clear: () => set({ messages: [] }),
   })
 )

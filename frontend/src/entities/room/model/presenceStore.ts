@@ -9,6 +9,7 @@ type PresenceActions = {
   setOnline: (userIds: number[]) => void
   addUser: (userId: number) => void
   removeUser: (userId: number) => void
+  clear: () => void
 }
 
 export const usePresenceStore = create<PresenceState & PresenceActions>(
@@ -30,5 +31,7 @@ export const usePresenceStore = create<PresenceState & PresenceActions>(
         newSet.delete(userId)
         return { onlineUserIds: newSet }
       }),
+
+    clear: () => set({ onlineUserIds: new Set() }),
   })
 )

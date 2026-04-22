@@ -9,6 +9,7 @@ type RoomState = {
 type RoomActions = {
   setCurrentRoom: (room: Room | null) => void
   addUser: (userId: User['id']) => void
+  clear: () => void
 }
 
 export const useRoomStore = create<RoomState & RoomActions>(set => ({
@@ -36,4 +37,6 @@ export const useRoomStore = create<RoomState & RoomActions>(set => ({
         },
       }
     }),
+
+  clear: () => set({ currentRoom: null }),
 }))
