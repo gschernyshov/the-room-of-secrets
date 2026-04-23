@@ -1,7 +1,7 @@
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { useRoomStore } from '@/entities/room/model/roomStore'
-import styles from './RoomSidebar.module.scss'
 import { usePresenceStore } from '@/entities/room/model/presenceStore'
+import styles from './RoomSidebar.module.scss'
 
 export const RoomSidebar = () => {
   const { user } = useSessionStore()

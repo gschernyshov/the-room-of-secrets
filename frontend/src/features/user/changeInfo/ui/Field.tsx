@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, Button } from '@gravity-ui/uikit'
@@ -28,8 +28,8 @@ export const Field = ({ nameField }: Props) => {
     register,
     watch,
     setValue,
-    formState: { errors, isSubmitting },
     handleSubmit,
+    formState: { errors, isSubmitting },
     setError,
     clearErrors,
   } = useForm({
@@ -49,7 +49,10 @@ export const Field = ({ nameField }: Props) => {
 
   useEffect(() => {
     if (errors.root) {
-      errorAlert('Обновление данных пользователя', errors.root.message)
+      errorAlert(
+        `Ошибка обновления ${nameField} пользователя`,
+        errors.root.message
+      )
     }
   }, [errors.root])
 
@@ -60,9 +63,9 @@ export const Field = ({ nameField }: Props) => {
       setValue(nameField, user?.[nameField])
       clearErrors(nameField)
 
-      if (user?.[nameField] !== currentValue) {
+      if (currentValue !== user?.[nameField]) {
         errorAlert(
-          'Обновление данных пользователя',
+          `Ошибка обновления ${nameField} пользователя`,
           `Вы не сохранили ${nameField}`
         )
       }
@@ -93,7 +96,7 @@ export const Field = ({ nameField }: Props) => {
     try {
       await handleChangeInfo(nameField, data)
       successAlert(
-        'Обновление данных пользователя',
+        `Обновление ${nameField} пользователя`,
         `Вы успешно обновили ${nameField}`
       )
       setIsEdit(false)

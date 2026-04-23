@@ -1,6 +1,6 @@
-import { useSessionStore } from '@/entities/session/model/sessionStore'
+import { changeInfoApi } from './changeInfoApi'
 import { type ChangeInfoFormData, type FieldKey } from './cnangeInfoSchema'
-import { apiFetch } from '@/shared/api/apiFetch'
+import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { AppError } from '@/shared/utils/errors'
 
 export const useChangeInfo = () => {
@@ -18,14 +18,7 @@ export const useChangeInfo = () => {
     updateUser({ [nameField]: newValue })
 
     try {
-      const response = await apiFetch(`/user/update/${nameField}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-
-      const result = await response.json()
+      const result = await changeInfoApi(nameField, data)
 
       if (result.success) {
         return

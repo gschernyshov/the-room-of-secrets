@@ -1,9 +1,9 @@
 import { useLocation } from 'react-router-dom'
+import { loginApi } from './loginApi'
 import { type LoginFormData } from './loginSchema'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { tokenService } from '@/shared/auth/lib/tokenService'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
-import { apiFetch } from '@/shared/api/apiFetch'
 import { AppError } from '@/shared/utils/errors'
 import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
@@ -14,14 +14,7 @@ export const useLogin = () => {
 
   const handleLogin = async (data: LoginFormData) => {
     try {
-      const response = await apiFetch('/auth/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-
-      const result = await response.json()
+      const result = await loginApi(data)
 
       if (result.success) {
         const { accessToken, user } = result.data

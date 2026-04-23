@@ -53,8 +53,9 @@ export const LoginForm = () => {
         )}
 
         <div className={styles['login-form__field']}>
-          <label>Email</label>
+          <label htmlFor="email">Email</label>
           <TextInput
+            id="email"
             size="xl"
             pin="round-round"
             disabled={isSubmitting}
@@ -67,8 +68,9 @@ export const LoginForm = () => {
         </div>
 
         <div className={styles['login-form__field']}>
-          <label>Пароль</label>
+          <label htmlFor="password">Пароль</label>
           <PasswordInput
+            id="password"
             size="xl"
             pin="round-round"
             disabled={isSubmitting}

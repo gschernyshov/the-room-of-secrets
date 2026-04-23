@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { leaveRoomApi } from './leaveRoomApi'
 import { useRoomListStore } from '@/entities/room/model/roomListStore'
 import { type Room } from '@/entities/room/types'
-import { apiFetch } from '@/shared/api/apiFetch'
 import { AppError } from '@/shared/utils/errors'
 
 export const useLeaveRoom = () => {
@@ -12,13 +12,7 @@ export const useLeaveRoom = () => {
 
     setIsLoading(true)
     try {
-      const response = await apiFetch('/room/leave', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      })
-
-      const result = await response.json()
+      const result = await leaveRoomApi({ id })
 
       if (result.success) {
         useRoomListStore.getState().removeRoom(id)

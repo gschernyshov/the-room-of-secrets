@@ -14,9 +14,7 @@ interface AlertActions {
   closeAlert: () => void
 }
 
-export type AlertStore = AlertState & AlertActions
-
-export const useAlertStore = create<AlertStore>((set, get) => {
+export const useAlertStore = create<AlertState & AlertActions>((set, get) => {
   let timeoutId: ReturnType<typeof setTimeout> | null = null
 
   return {

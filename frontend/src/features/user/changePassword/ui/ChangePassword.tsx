@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, Button, Tooltip, ClipboardButton } from '@gravity-ui/uikit'
 import { Paintbrush } from '@gravity-ui/icons'
-import { generatePassword } from '../lib/generatePassword'
 import { useChangePassword } from '../lib/useChangePassword'
 import {
   changePasswordSchema,
   type ChangePasswordFormData,
 } from '../lib/changePasswordSchema'
+import { generatePassword } from '../lib/generatePassword'
 import { fieldNames } from '../model/initChangePassword'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
@@ -42,8 +42,9 @@ export const ChangePassword = () => {
 
   useEffect(() => {
     if (errors.root) {
-      errorAlert('Обновление данных пользователя', errors.root.message)
+      errorAlert('Обновление пароля пользователя', errors.root.message)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.root])
 
   useOnClickOutside(form, () => {
@@ -55,7 +56,7 @@ export const ChangePassword = () => {
 
       setGeneratedPassword('')
 
-      errorAlert('Обновление данных пользователя', 'Вы не сохранили пароль')
+      errorAlert('Обновление пароля пользователя', 'Вы не сохранили пароль')
 
       setIsEdit(false)
     }, 0)

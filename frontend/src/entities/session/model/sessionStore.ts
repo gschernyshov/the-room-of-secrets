@@ -1,7 +1,7 @@
 import { create } from 'zustand'
+import { userApi } from '../lib/userApi'
 import { type User } from '@/entities/user/model/types'
 import { tokenService } from '@/shared/auth/lib/tokenService'
-import { apiFetch } from '@/shared/api/apiFetch'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import { AppError } from '@/shared/utils/errors'
 
@@ -58,8 +58,7 @@ export const useSessionStore = create<SessionState & SessionActions>(set => ({
 
     set({ accessToken: token, error: null })
     try {
-      const response = await apiFetch('/user/me')
-      const result = await response.json()
+      const result = await userApi()
 
       if (result.success) {
         set({ status: 'authenticated', user: result.data })

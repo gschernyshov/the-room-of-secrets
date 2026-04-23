@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { logoutApi } from './logoutApi'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { tokenService } from '@/shared/auth/lib/tokenService'
-import { apiFetch } from '@/shared/api/apiFetch'
 import { AppError } from '@/shared/utils/errors'
 
 export const useLogout = () => {
@@ -12,12 +12,7 @@ export const useLogout = () => {
 
     setIsLoading(true)
     try {
-      const response = await apiFetch('/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      })
-
-      const result = await response.json()
+      const result = await logoutApi()
 
       if (result.success) {
         tokenService.cleanRemove()

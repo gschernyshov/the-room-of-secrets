@@ -13,7 +13,7 @@ export const useShowAlert = () => {
     show('success', title, message)
   const warningAlert = (title: string, message: string) =>
     show('warning', title, message)
-  const errorAlert = (title: string, message = 'Ошибка') =>
+  const errorAlert = (title: string, message: string = 'Ошибка') =>
     show('danger', title, message)
 
   return {

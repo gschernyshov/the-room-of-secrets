@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import { createRoomApi } from './createRoomApi'
 import { useRoomListStore } from '@/entities/room/model/roomListStore'
 import { type Room } from '@/entities/room/types'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
-import { apiFetch } from '@/shared/api/apiFetch'
 import { AppError } from '@/shared/utils/errors'
 
 export const useCreateRoom = () => {
@@ -14,13 +14,7 @@ export const useCreateRoom = () => {
 
     setIsLoading(true)
     try {
-      const response = await apiFetch('/room/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
-      })
-
-      const result = await response.json()
+      const result = await createRoomApi({ name })
 
       if (result.success) {
         useRoomListStore.getState().addRoom(result.data)

@@ -8,8 +8,8 @@ export const changeInfoSchema = z
     email: email('Некорректный email').optional(),
   })
   .refine(data => data.username !== undefined || data.email !== undefined, {
-    message: 'Укажите хотя бы одно поле',
     path: ['root'],
+    message: 'Укажите хотя бы одно поле',
   })
 
 export type ChangeInfoFormData = z.infer<typeof changeInfoSchema>

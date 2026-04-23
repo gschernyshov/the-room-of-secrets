@@ -1,7 +1,7 @@
 import { create } from 'zustand'
+import { roomListApi } from '../lib/roomListApi'
 import { type Room } from '../types'
 import { type User } from '@/entities/user/model/types'
-import { apiFetch } from '@/shared/api/apiFetch'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import { AppError } from '@/shared/utils/errors'
 
@@ -36,8 +36,7 @@ export const useRoomListStore = create<RoomListState & RoomListActions>(
     loadUserRooms: async () => {
       set({ isLoading: true, error: null })
       try {
-        const response = await apiFetch('/room/user')
-        const result = await response.json()
+        const result = await roomListApi()
 
         if (result.success) {
           set({ rooms: result.data })
