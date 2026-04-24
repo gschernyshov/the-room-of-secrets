@@ -1,62 +1,39 @@
-import clsx from 'clsx'
-import { useRef, useMemo, useCallback } from 'react'
 import { AsideHeader as GravityAsideHeader } from '@gravity-ui/navigation'
 import { CardClub } from '@gravity-ui/icons'
+import { useAsideState } from '../model/useAsideState'
+import { useAsideMenu } from '../model/useAsideMenu'
+import { useMenuStyles } from '../model/useMenuStyles'
 import { Footer } from './Footer'
 import { AsideBackground } from './AsideBackground'
-import { ID_TO_ROUTE, buildGuestMenuItems, buildAuthMenuItems } from '../сonfig'
-import { useSessionStore } from '@/entities/session/model/sessionStore'
-import { useLocalStorage } from '@/shared/lib/hooks/useLocalStorage'
-import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 import styles from './AsideHeader.module.scss'
 
 export const AsideHeader = () => {
-  const { pathname, goToLogin, goToRegister, goToHome, goToProfile } =
+  const { goToLogin, goToRegister, goToHome, goToProfile, pathname } =
     useAppNavigate()
-  const status = useSessionStore(state => state.status)
-  const asideRef = useRef<HTMLDivElement>(null)
-  const [compact, setCompact] = useLocalStorage('aside-open', true)
+  const { asideRef, compact, setCompact } = useAsideState()
 
-  const handleClose = useCallback(() => {
-    if (compact) return
-    setCompact(true)
-  }, [compact, setCompact])
-
-  useOnClickOutside(asideRef, handleClose)
-
-  const handleLogin = useCallback(() => {
+  const handleLogin = () => {
     goToLogin()
     setCompact(true)
-  }, [goToLogin, setCompact])
+  }
 
-  const handleRegister = useCallback(() => {
+  const handleRegister = () => {
     goToRegister()
     setCompact(true)
-  }, [goToRegister, setCompact])
+  }
 
-  const handleProfile = useCallback(() => {
+  const handleProfile = () => {
     goToProfile()
     setCompact(true)
-  }, [goToProfile, setCompact])
+  }
 
-  const menuItems = useMemo(() => {
-    if (status !== 'authenticated') {
-      return buildGuestMenuItems({
-        onLogin: handleLogin,
-        onRegister: handleRegister,
-      })
-    }
-    return buildAuthMenuItems()
-  }, [status, handleLogin, handleRegister])
+  const menuItems = useAsideMenu({
+    onLogin: handleLogin,
+    onRegister: handleRegister,
+  })
 
-  const menuItemsWithStyles = menuItems.map(item => ({
-    ...item,
-    className: clsx(
-      styles['aside-header__item'],
-      pathname === ID_TO_ROUTE[item.id] && styles['aside-header__item--active']
-    ),
-  }))
+  const menuItemsWithStyles = useMenuStyles(menuItems, pathname, styles)
 
   return (
     <div ref={asideRef} className={styles['aside-header']}>

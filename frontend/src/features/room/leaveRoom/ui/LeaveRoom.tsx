@@ -1,7 +1,7 @@
 import { Button } from '@gravity-ui/uikit'
-import { useLeaveRoom } from '../lib/useLeaveRoom'
+import { useLeaveRoom } from '../model/useLeaveRoom'
 import { useShowAlert } from '@/widgets/globalAlert'
-import { type Room } from '@/entities/room/types'
+import { type Room } from '@/entities/room/model/types'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 
 type Props = {

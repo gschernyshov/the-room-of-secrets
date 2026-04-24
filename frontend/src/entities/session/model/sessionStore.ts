@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { userApi } from '../lib/userApi'
+import { userApi } from '../api/user'
 import { type User } from '@/entities/user/model/types'
 import { tokenService } from '@/shared/auth/lib/tokenService'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'

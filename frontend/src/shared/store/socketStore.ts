@@ -8,7 +8,7 @@ type SocketState = {
 type SockerActions = {
   setConnecting: () => void
   setConnected: () => void
-  setDisconnected: (error?: string) => void
+  setDisconnected: () => void
 }
 
 export const useSocketStore = create<SocketState & SockerActions>()(set => ({

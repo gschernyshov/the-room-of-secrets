@@ -17,3 +17,6 @@ export const TABS: readonly TabItem[] = Object.entries(TAB_CONFIG).map(
     label,
   })
 )
+
+export const isValidTab = (value: string): value is Tab =>
+  Object.keys(TAB_CONFIG).includes(value)

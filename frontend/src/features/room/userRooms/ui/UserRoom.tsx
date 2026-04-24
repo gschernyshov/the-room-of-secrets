@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { Button, Popup } from '@gravity-ui/uikit'
 import { RoomCard } from './RoomCard'
-import { type Room } from '@/entities/room/types'
+import { type Room } from '@/entities/room/model/types'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
 
 type Props = {

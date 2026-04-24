@@ -3,13 +3,13 @@ import { useRef, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, Button } from '@gravity-ui/uikit'
-import { useChangeInfo } from '../lib/useChangeInfo'
+import { useChangeInfo } from '../model/useChangeInfo'
 import {
   changeInfoSchema,
-  type ChangeInfoFormData,
+  type ChangeInfo,
   type FieldKey,
-} from '../lib/cnangeInfoSchema'
-import { getInitialFormData, fieldNames } from '../model/initChangeInfo'
+} from '../model/schema'
+import { getInitialFormData, fieldNames } from '../model/initData'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
@@ -38,10 +38,7 @@ export const Field = ({ nameField }: Props) => {
     mode: 'onBlur', // Валидация при потере фокуса
     reValidateMode: 'onBlur', // Перепроверка при изменении
   })
-  const handleErrors = createHandleFormErrors<ChangeInfoFormData>(
-    fieldNames,
-    setError
-  )
+  const handleErrors = createHandleFormErrors<ChangeInfo>(fieldNames, setError)
   const form = useRef<HTMLFormElement>(null)
   const [isEdit, setIsEdit] = useState(false)
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -90,7 +87,7 @@ export const Field = ({ nameField }: Props) => {
     }
   }
 
-  const onSubmit = async (data: ChangeInfoFormData) => {
+  const onSubmit = async (data: ChangeInfo) => {
     if (isSubmitting) return
 
     try {

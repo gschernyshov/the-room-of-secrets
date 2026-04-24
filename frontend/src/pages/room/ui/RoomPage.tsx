@@ -1,85 +1,62 @@
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { RoomInfo, RoomSidebar } from '@/widgets/room'
-import { MessageList } from '@/widgets/message'
+import { RoomChat } from '@/widgets/roomChat'
+import { RoomSidebar } from '@/widgets/roomSidebar'
 import { useShowAlert } from '@/widgets/globalAlert'
-import { SendMessageForm } from '@/features/message/sendMessage'
-import { useRoomListStore } from '@/entities/room/model/roomListStore'
+import { useJoinRoom } from '@/features/room/joinRoom'
+import { useExitRoom } from '@/features/room/exitRoom'
 import { useRoomStore } from '@/entities/room/model/roomStore'
-import { usePresenceStore } from '@/entities/room/model/presenceStore'
-import { roomService } from '@/entities/room/lib/roomService'
-import { useRoomEvents } from '@/entities/room/lib/useRoomEvents'
-import { useMessagesStore } from '@/entities/message/model/messagesStore'
-import { useMessageEvents } from '@/entities/message/lib/useMessageEvents'
+import { useRoomEvents } from '@/entities/room/model/useRoomEvents'
+import { type Room } from '@/entities/room/model/types'
+import { useMessageEvents } from '@/entities/message/model/useMessageEvents'
 import { useSocketStore } from '@/shared/store/socketStore'
 import { usePageTitle } from '@/shared/lib/hooks/usePageTitle'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
-import { getErrorMessage } from '@/shared/utils/getErrorMessage'
-import { Loader } from '@/shared/ui/Loader'
+import { Loader } from '@/shared/ui/Loader/Loader'
 import styles from './RoomPage.module.scss'
 
 export const RoomPage = () => {
-  const { roomId } = useParams()
-  const currentRoom = useRoomStore(state => state.currentRoom)
-  const { isConnecting, isConnected } = useSocketStore()
-  const { goToProfile } = useAppNavigate()
-  const { errorAlert } = useShowAlert()
+  const { roomId } = useParams<Record<'roomId', Room['id']>>()
 
-  usePageTitle(`Комната: «${roomId}»`)
+  usePageTitle(`Комната${roomId ? `: «${roomId}»` : ''}`)
 
   useRoomEvents()
   useMessageEvents()
 
+  const { error } = useRoomStore()
+  const { isConnecting, isConnected } = useSocketStore()
+  const { goToProfile } = useAppNavigate()
+  const { isLoading, join } = useJoinRoom()
+  const { exit } = useExitRoom()
+  const { errorAlert } = useShowAlert()
+
   useEffect(() => {
-    if (!roomId || !isConnected) return
+    if (!isConnected || !roomId) return
 
-    const joinRoom = async () => {
-      try {
-        const { room, messages, onlineUserIds } =
-          await roomService.joinRoom(roomId)
-
-        useRoomListStore.getState().addRoom(room)
-        useRoomStore.getState().setCurrentRoom(room)
-        usePresenceStore.getState().setOnline(onlineUserIds)
-        useMessagesStore.getState().setMessages(messages)
-      } catch (error) {
-        goToProfile()
-        errorAlert(`Ошибка при подключении к комнате`, getErrorMessage(error))
-      }
-    }
-
-    joinRoom()
+    join(roomId)
 
     return () => {
-      if (roomId) {
-        roomService.leaveRoom(roomId)
-
-        useRoomStore.getState().clear()
-        usePresenceStore.getState().clear()
-        useMessagesStore.getState().clear()
-      }
+      if (isConnected) exit(roomId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, isConnected])
 
-  if (isConnecting || !currentRoom) {
+  useEffect(() => {
+    if (error) {
+      errorAlert(`Ошибка при подключении к комнате`, error)
+      goToProfile()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
+
+  if (isConnecting || isLoading) {
     return <Loader size="m" />
   }
 
   return (
     <div className={styles['room-page']}>
       <div className={styles['room-page__chat-area']}>
-        <div className={styles['room-page__chat-header']}>
-          <RoomInfo />
-        </div>
-
-        <div className={styles['room-page__chat-messages']}>
-          <MessageList />
-        </div>
-
-        <div className={styles['room-page__chat-input']}>
-          <SendMessageForm />
-        </div>
+        <RoomChat />
       </div>
 
       <div className={styles['room-page__sidebar']}>

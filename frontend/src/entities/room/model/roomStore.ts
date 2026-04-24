@@ -1,20 +1,22 @@
 import { create } from 'zustand'
-import { type Room } from '../types'
+import { type Room } from './types'
 import { type User } from '@/entities/user/model/types'
 
 type RoomState = {
   currentRoom: Room | null
+  error: string | null
 }
 
 type RoomActions = {
   setCurrentRoom: (room: Room | null) => void
   addUser: (userId: User['id']) => void
+  setError: (error: string | null) => void
   clear: () => void
 }
 
 export const useRoomStore = create<RoomState & RoomActions>(set => ({
   currentRoom: null,
-
+  error: null,
   setCurrentRoom: room => set({ currentRoom: room }),
 
   addUser: (userId: User['id']) =>
@@ -38,5 +40,7 @@ export const useRoomStore = create<RoomState & RoomActions>(set => ({
       }
     }),
 
-  clear: () => set({ currentRoom: null }),
+  setError: error => set({ error }),
+
+  clear: () => set({ currentRoom: null, error: null }),
 }))

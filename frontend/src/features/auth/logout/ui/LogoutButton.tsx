@@ -1,6 +1,6 @@
 import { Button, Icon } from '@gravity-ui/uikit'
 import { ArrowRightFromSquare } from '@gravity-ui/icons'
-import { useLogout } from '../lib/useLogout'
+import { useLogout } from '../model/useLogout'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import styles from './LogoutButton.module.scss'

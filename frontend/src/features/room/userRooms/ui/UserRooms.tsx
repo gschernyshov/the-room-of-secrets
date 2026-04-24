@@ -1,6 +1,6 @@
 import { UserRoom } from './UserRoom'
 import { useRoomListStore } from '@/entities/room/model/roomListStore'
-import { Loader } from '@/shared/ui/Loader'
+import { Loader } from '@/shared/ui/Loader/Loader'
 import styles from './UserRooms.module.scss'
 
 export const UserRooms = () => {

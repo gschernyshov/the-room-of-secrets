@@ -5,23 +5,7 @@
   overflow: hidden;
 
   &__chat-area {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
     width: 75%;
-  }
-
-  &__chat-header {
-    flex: 1;
-  }
-
-  &__chat-messages {
-    flex: 8;
-    overflow-y: auto;
-  }
-
-  &__chat-input {
-    flex: 1;
   }
 
   &__sidebar {

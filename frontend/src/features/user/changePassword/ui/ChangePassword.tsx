@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, Button, Tooltip, ClipboardButton } from '@gravity-ui/uikit'
 import { Paintbrush } from '@gravity-ui/icons'
-import { useChangePassword } from '../lib/useChangePassword'
+import { useChangePassword } from '../model/useChangePassword'
 import {
   changePasswordSchema,
-  type ChangePasswordFormData,
-} from '../lib/changePasswordSchema'
+  type ChangePassword as TChangePassword,
+} from '../model/schema'
+import { fieldNames } from '../model/initData'
 import { generatePassword } from '../lib/generatePassword'
-import { fieldNames } from '../model/initChangePassword'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
@@ -32,7 +32,7 @@ export const ChangePassword = () => {
     mode: 'onBlur', // Валидация при потере фокуса
     reValidateMode: 'onBlur', // Перепроверка при изменении
   })
-  const handleErrors = createHandleFormErrors<ChangePasswordFormData>(
+  const handleErrors = createHandleFormErrors<TChangePassword>(
     fieldNames,
     setError
   )
@@ -84,11 +84,12 @@ export const ChangePassword = () => {
     }
   }
 
-  const onSubmit = async (data: ChangePasswordFormData) => {
+  const onSubmit = async (data: TChangePassword) => {
     if (isSubmitting) return
 
     try {
       await handleChangePassword(data)
+
       successAlert(
         'Обновление данных пользователя',
         `Вы успешно обновили пароль`

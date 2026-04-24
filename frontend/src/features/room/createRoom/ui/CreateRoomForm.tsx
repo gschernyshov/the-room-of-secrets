@@ -1,6 +1,6 @@
 import { useState, type SubmitEvent } from 'react'
 import { TextInput, Button } from '@gravity-ui/uikit'
-import { useCreateRoom } from '../lib/useCreateRoom'
+import { useCreateRoom } from '../model/useCreateRoom'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import styles from './CreateRoomForm.module.scss'

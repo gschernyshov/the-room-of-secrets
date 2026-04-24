@@ -50,12 +50,12 @@
       color: rgb(222, 222, 222);
       border-bottom: 2px solid rgb(222, 222, 222, 0.2);
     }
+  }
 
-    &--active {
-      font-weight: 500;
-      color: rgb(222, 222, 222);
-      border-bottom: 2px solid rgb(222, 222, 222);
-    }
+  &__tab--active {
+    font-weight: 500;
+    color: rgb(222, 222, 222);
+    border-bottom: 2px solid rgb(222, 222, 222);
   }
 
   &__content {

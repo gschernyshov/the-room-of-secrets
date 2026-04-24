@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { roomListApi } from '../lib/roomListApi'
-import { type Room } from '../types'
+import { type Room } from './types'
+import { roomListApi } from '../api/roomList'
 import { type User } from '@/entities/user/model/types'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
 import { AppError } from '@/shared/utils/errors'
@@ -12,8 +12,8 @@ type RoomListState = {
 }
 
 type RoomListActions = {
-  removeRoom: (roomId: Room['id']) => void
   addRoom: (room: Room) => void
+  removeRoom: (roomId: Room['id']) => void
   loadUserRooms: (userId: User['id']) => Promise<void>
 }
 

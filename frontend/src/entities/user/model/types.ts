@@ -1,4 +1,4 @@
-import { type Room } from '@/entities/room/types'
+import { type Room } from '@/entities/room/model/types'
 
 export type User = {
   id: number

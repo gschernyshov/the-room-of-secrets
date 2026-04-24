@@ -2,8 +2,8 @@ import { useEffect, type ReactNode } from 'react'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import { useRoomListStore } from '@/entities/room/model/roomListStore'
-import { initTokenRefreshListener } from '@/entities/session/lib/initTokenRefreshListener'
-import { Loader } from '@/shared/ui/Loader'
+import { initTokenRefreshListener } from '@/entities/session/model/initTokenRefreshListener'
+import { Loader } from '@/shared/ui/Loader/Loader'
 
 type Props = {
   children: ReactNode

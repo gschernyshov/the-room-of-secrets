@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, PasswordInput, Button } from '@gravity-ui/uikit'
-import { useLogin } from '../lib/useLogin'
-import { loginSchema, type LoginFormData } from '../lib/loginSchema'
-import { initLoginFormData, fieldNames } from '../model/initLoginFormData'
+import { useLogin } from '../model/useLogin'
+import { loginSchema, type LoginData } from '../model/schema'
+import { initLoginData, fieldNames } from '../model/initData'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
 import styles from './LoginForm.module.scss'
@@ -16,18 +16,15 @@ export const LoginForm = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<LoginFormData>({
+  } = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      ...initLoginFormData,
+      ...initLoginData,
     },
   })
-  const handleErrors = createHandleFormErrors<LoginFormData>(
-    fieldNames,
-    setError
-  )
+  const handleErrors = createHandleFormErrors<LoginData>(fieldNames, setError)
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: LoginData) => {
     if (isSubmitting) return
 
     try {

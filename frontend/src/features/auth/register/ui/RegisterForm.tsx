@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { TextInput, PasswordInput, Button } from '@gravity-ui/uikit'
-import { useRegister } from '../lib/useRegister'
-import { registerSchema, type RegisterFormData } from '../lib/registerSchema'
-import { initRegisterData, fieldNames } from '../model/initRegisterData'
+import { useRegister } from '../model/useRegister'
+import { registerSchema, type RegisterData } from '../model/schema'
+import { initRegisterData, fieldNames } from '../model/initData'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
 import styles from './RegisterForm.module.scss'
@@ -16,18 +16,18 @@ export const RegisterForm = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<RegisterFormData>({
+  } = useForm<RegisterData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       ...initRegisterData,
     },
   })
-  const handleErrors = createHandleFormErrors<RegisterFormData>(
+  const handleErrors = createHandleFormErrors<RegisterData>(
     fieldNames,
     setError
   )
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const onSubmit = async (data: RegisterData) => {
     if (isSubmitting) return
 
     try {

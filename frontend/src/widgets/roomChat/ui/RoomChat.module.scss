@@ -1,0 +1,20 @@
+.room-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  width: 100%;
+
+  &__header {
+    flex: 1;
+  }
+
+  &__messages {
+    flex: 8;
+    overflow-y: auto;
+  }
+
+  &__send-message {
+    flex: 1;
+  }
+}

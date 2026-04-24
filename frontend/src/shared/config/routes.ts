@@ -6,9 +6,10 @@ export const ROUTES = {
   createRoom: '/room/create',
   leaveRoom: '/room/leave',
   user: {
+    me: '/user/me',
     update: (field: string) => `/user/update/${field}` as const,
   },
-  api: {
-    me: '/api/me',
+  room: {
+    user: '/room/user',
   },
 } as const

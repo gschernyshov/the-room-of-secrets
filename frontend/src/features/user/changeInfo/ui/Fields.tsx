@@ -1,5 +1,5 @@
 import { Field } from './Field'
-import { fieldNames } from '../model/initChangeInfo'
+import { fieldNames } from '../model/initData'
 import styles from './Fields.module.scss'
 
 export const Fields = () => {

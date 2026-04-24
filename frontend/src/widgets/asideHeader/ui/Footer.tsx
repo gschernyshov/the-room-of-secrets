@@ -1,7 +1,6 @@
 import { Avatar } from '@gravity-ui/uikit'
-import { useSessionStore } from '@/entities/session/model/sessionStore'
+import { useFooterData } from '../model/useFooterData'
 import { LogoutButton } from '@/features/auth/logout/ui/LogoutButton'
-import { useSocketStore } from '@/shared/store/socketStore'
 import styles from './Footer.module.scss'
 
 type Props = {
@@ -10,8 +9,7 @@ type Props = {
 }
 
 export const Footer = ({ compact, handleProfile }: Props) => {
-  const { status, user } = useSessionStore()
-  const { isConnecting, isConnected } = useSocketStore()
+  const { user, status, isConnecting, isConnected } = useFooterData()
 
   if (status !== 'authenticated') return null
 
@@ -34,7 +32,7 @@ export const Footer = ({ compact, handleProfile }: Props) => {
             <span className={styles['footer__username']}>
               @{user?.username}
             </span>
-            <span className={styles['footeк__email']}>{user?.email}</span>
+            <span className={styles['footer__email']}>{user?.email}</span>
           </div>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { type Message } from '../types'
+import { type Message } from './types'
 
 type MessagesState = {
   messages: Message[]

@@ -1,6 +1,6 @@
 import { Button, ClipboardButton } from '@gravity-ui/uikit'
 import { LeaveRoom } from '@/features/room/leaveRoom'
-import { type Room } from '@/entities/room/types'
+import { type Room } from '@/entities/room/model/types'
 import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 import styles from './RoomCard.module.scss'
 

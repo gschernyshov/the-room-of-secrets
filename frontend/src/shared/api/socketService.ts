@@ -1,7 +1,7 @@
 import { io, type Socket } from 'socket.io-client'
 import { apiFetch } from './apiFetch'
 import { tokenService } from '../auth/lib/tokenService'
-import { checkIfTokenExpired } from '../utils/jwt'
+import { checkIfTokenExpired } from '../auth/utils/jwt'
 import { AppError } from '../utils/errors'
 import { type SocketCallback } from '../types/socket.types'
 
