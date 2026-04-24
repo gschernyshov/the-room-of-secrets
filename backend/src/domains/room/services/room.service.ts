@@ -68,12 +68,12 @@ export const roomService = {
   },
 
   leave: async (roomId: Room['id'], userId: User['id']): Promise<boolean> => {
-    logger.info(`Пользователь id: ${userId} выходит из комнаты id: ${roomId}`)
+    logger.info(`Пользователь id: ${userId} покидает комнату id: ${roomId}`)
 
     try {
       const rooms = await roomRepository.leave(roomId, userId)
       if (!rooms) {
-        throw new AppError('Не удалось выйти из комнаты', 500)
+        throw new AppError('Не удалось покинуть комнату', 500)
       }
 
       // Проверяем, ушли ли ВСЕ участники из комнаты:
@@ -87,7 +87,7 @@ export const roomService = {
       return deleted
     } catch (error) {
       logger.error(
-        `При выходе из комнаты id: ${roomId} пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
+        `При попытке покинуть комнату id: ${roomId} пользователя id: ${userId} возникла ошибка${error instanceof Error ? `: ${error.message}` : ``}`
       )
 
       if (error instanceof AppError) {
@@ -95,7 +95,7 @@ export const roomService = {
       }
 
       throw new AppError(
-        'При выходе из комнаты возникла непредвиденная ошибка',
+        'При попытке покинуть комнату возникла непредвиденная ошибка',
         500
       )
     }

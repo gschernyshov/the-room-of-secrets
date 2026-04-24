@@ -93,7 +93,7 @@ export const roomHandler = (io: Server, socket: Socket, userId: User['id']) => {
   )
 
   socket.on(
-    'leave_room',
+    'exit_room',
     async (payload: unknown, callback?: SocketCallback): Promise<void> => {
       try {
         // Валидация входных данных
