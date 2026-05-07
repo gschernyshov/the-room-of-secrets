@@ -1,8 +1,8 @@
 import { type AsideHeaderItem } from '@gravity-ui/navigation'
-import { loginMenuItem } from '@/features/auth/login/config/loginMenuItem'
-import { registerMenuItem } from '@/features/auth/register/config/registerMenuItem'
+import { loginMenuItem } from '@/features/auth/login'
+import { registerMenuItem } from '@/features/auth/register'
 
-type GuestActions = {
+type GuestPayload = {
   onLogin: () => void
   onRegister: () => void
 }
@@ -10,7 +10,7 @@ type GuestActions = {
 export const buildGuestMenuItems = ({
   onLogin,
   onRegister,
-}: GuestActions): AsideHeaderItem[] => [
+}: GuestPayload): AsideHeaderItem[] => [
   ...loginMenuItem(onLogin),
   ...registerMenuItem(onRegister),
 ]

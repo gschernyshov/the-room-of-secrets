@@ -2,13 +2,15 @@ import { useCallback } from 'react'
 import {
   useNavigate,
   useLocation,
+  useSearchParams,
   type NavigateOptions,
 } from 'react-router-dom'
 import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
 export const useAppNavigate = () => {
   const navigate = useNavigate()
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
+  const [searchParams] = useSearchParams()
 
   const goToHome = useCallback(
     (params?: NavigateOptions) => {
@@ -32,8 +34,11 @@ export const useAppNavigate = () => {
   )
 
   const goToProfile = useCallback(
-    (params?: NavigateOptions) => {
-      navigate(RoutePath[AppRoutes.PROFILE], params)
+    (activeTab?: string, options?: NavigateOptions) => {
+      const search = activeTab
+        ? `?activeTab=${encodeURIComponent(activeTab)}`
+        : ''
+      navigate(RoutePath[AppRoutes.PROFILE] + search, options)
     },
     [navigate]
   )
@@ -55,6 +60,8 @@ export const useAppNavigate = () => {
 
   return {
     pathname,
+    search,
+    searchParams,
     navigate,
     goToHome,
     goToLogin,

@@ -41,7 +41,6 @@ export const Field = ({ nameField }: Props) => {
   const handleErrors = createHandleFormErrors<ChangeInfo>(fieldNames, setError)
   const form = useRef<HTMLFormElement>(null)
   const [isEdit, setIsEdit] = useState(false)
-  // eslint-disable-next-line react-hooks/incompatible-library
   const currentValue = watch(nameField)
 
   useEffect(() => {
@@ -51,6 +50,7 @@ export const Field = ({ nameField }: Props) => {
         errors.root.message
       )
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors.root])
 
   useOnClickOutside(form, () => {

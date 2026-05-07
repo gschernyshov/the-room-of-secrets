@@ -7,15 +7,14 @@ export const useAsideState = () => {
   const [compact, setCompact] = useLocalStorage('aside-open', true)
 
   const handleClose = useCallback(() => {
-    if (compact) return
     setCompact(true)
-  }, [compact, setCompact])
+  }, [setCompact])
 
   useOnClickOutside(asideRef, handleClose)
 
   return {
     asideRef,
     compact,
-    setCompact,
+    handleClose,
   }
 }
