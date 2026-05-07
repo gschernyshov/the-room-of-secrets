@@ -1,19 +1,28 @@
 import clsx from 'clsx'
+import { useEffect } from 'react'
 import { Avatar } from '@gravity-ui/uikit'
 import { useInitProfileStore } from '../model/useInitProfileStore'
 import { useProfileCardStore } from '../model/profileCardStore'
-import { TABS } from '../model/tab'
+import { TABS, isValidTab } from '../model/tab'
 import { ChangeInfo } from '@/features/user/changeInfo'
 import { ChangePassword } from '@/features/user/changePassword'
 import { UserRooms } from '@/features/room/userRooms'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
 import styles from './ProfileCard.module.scss'
 
-export const ProfileCard = () => {
+type Props = {
+  tab: string | null
+}
+
+export const ProfileCard = ({ tab }: Props) => {
   useInitProfileStore()
 
   const { user } = useSessionStore()
   const { activeTab, setActiveTab } = useProfileCardStore()
+
+  useEffect(() => {
+    if (tab && isValidTab(tab)) setActiveTab(tab)
+  }, [tab, setActiveTab])
 
   return (
     <div className={styles['profile-card']}>
