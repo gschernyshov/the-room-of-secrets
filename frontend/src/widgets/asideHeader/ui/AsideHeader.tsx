@@ -13,7 +13,7 @@ import styles from './AsideHeader.module.scss'
 export const AsideHeader = () => {
   const { goToLogin, goToRegister, goToHome, goToProfile, goToRoom, pathname } =
     useAppNavigate()
-  const { asideRef, compact, handleClose } = useAsideState()
+  const { asideRef, compact, onCompact, handleClose } = useAsideState()
 
   const handleLogin = useCallback(() => {
     goToLogin()
@@ -70,7 +70,7 @@ export const AsideHeader = () => {
     <div ref={asideRef} className={styles['aside-header']}>
       <GravityAsideHeader
         compact={compact} // Визуальное состояние элемента навигации
-        onChangeCompact={handleClose} // Обратный вызов, срабатывающий при изменении визуального состояния элемента навигации
+        onChangeCompact={onCompact} // Обратный вызов, срабатывающий при изменении визуального состояния элемента навигации
         logo={{
           icon: CardClub,
           iconSize: 30,
