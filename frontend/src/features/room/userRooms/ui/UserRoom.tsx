@@ -3,6 +3,7 @@ import { Button, Popup } from '@gravity-ui/uikit'
 import { RoomCard } from './RoomCard'
 import { type Room } from '@/entities/room/model/types'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
+import styles from './UserRoom.module.scss'
 
 type Props = {
   room: Room
@@ -35,7 +36,12 @@ export const UserRoom = ({ room }: Props) => {
       <Button ref={triggerRef} onClick={() => setPopupOpen(!popupOpen)}>
         {room.name}
       </Button>
-      <Popup anchorRef={triggerRef} open={popupOpen} placement="auto-end">
+      <Popup
+        anchorRef={triggerRef}
+        open={popupOpen}
+        placement="auto-end"
+        className={styles['user-room-popup']}
+      >
         <RoomCard room={room} />
       </Popup>
     </div>
