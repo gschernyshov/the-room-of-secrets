@@ -120,11 +120,15 @@ export const Field = ({ nameField }: Props) => {
           disabled={!isEdit || isSubmitting}
           placeholder={`Введите ${nameField}`}
           validationState={errors[nameField] ? 'invalid' : undefined}
-          errorMessage={errors[nameField]?.message}
+          errorMessage={
+            <p className={styles['change-info-form__error-message']}>
+              {errors[nameField]?.message}
+            </p>
+          }
           {...register(nameField)}
           className={clsx(
             styles['change-info-form__input'],
-            !isEdit && styles['change-info-form__input--not-active']
+            isEdit && styles['change-info-form__input--active']
           )}
         />
         <Button
@@ -132,12 +136,17 @@ export const Field = ({ nameField }: Props) => {
           type="button"
           size="xl"
           pin={isEdit ? 'circle-circle' : 'clear-circle'}
-          disabled={isSubmitting}
+          disabled={
+            (isEdit && user?.[nameField] === currentValue) || isSubmitting
+          }
           loading={isSubmitting}
           onClick={handleClick}
           className={clsx(
             styles['change-info-form__button'],
-            !isEdit && styles['change-info-form__button--not-active']
+            isEdit && styles['change-info-form__button--active'],
+            isEdit &&
+              currentValue !== user?.[nameField] &&
+              styles['change-info-form__button--not-disabled']
           )}
         >
           {isEdit

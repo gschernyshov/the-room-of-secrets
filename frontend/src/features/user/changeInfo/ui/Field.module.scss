@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
+  max-width: 450px;
 
   &__label {
     margin-left: 18px;
@@ -16,20 +17,41 @@
   }
 
   &__input {
-    margin-right: 5px;
-    --g-text-input-border-color: rgb(222, 222, 222);
+    --g-text-input-background-color: rgba(30, 30, 30, 0.6);
+    --g-text-input-border-color: #3a3a3a;
+    --g-text-input-border-color-hover: #3a3a3a;
+    --g-text-input-border-color-active: #888;
     --g-text-input-border-radius: 100px;
+    --g-text-input-text-color: #e0e0e0;
+    --g-text-input-placeholder-color: #777;
   }
 
-  &__input--not-active {
-    margin-right: 0px;
+  &__input--active {
+    --g-text-input-border-color-hover: #888;
+    margin-right: 5px;
+  }
+
+  &__error-message {
+    margin: 0 18px;
   }
 
   &__button {
-    --g-button-background-color: rgb(222, 222, 222);
+    border-left: 1px solid #3a3a3a;
+    transition: all 0.2s ease;
+    --g-button-background-color: rgba(30, 30, 30, 0.6);
+    --g-button-background-color-hover: #e0e0e0;
+    --g-button-border-color: #3a3a3a;
+    --g-button-border-width: 1px;
+    --g-button-text-color: #777;
+    --g-button-text-color-hover: #000;
   }
 
-  &__button--not-active {
-    opacity: 0.7;
+  &__button--active {
+    border-left: none;
+  }
+
+  &__button--not-disabled {
+    --g-button-background-color: #f5f5f5;
+    --g-button-text-color: #111;
   }
 }
