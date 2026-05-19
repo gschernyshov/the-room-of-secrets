@@ -15,6 +15,7 @@ import { useShowAlert } from '@/widgets/globalAlert'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
 import styles from './ChangePassword.module.scss'
+import { set } from 'zod/v3'
 
 export const ChangePassword = () => {
   const { handleChangePassword } = useChangePassword()
@@ -131,6 +132,10 @@ export const ChangePassword = () => {
             </p>
           }
           {...register('password')}
+          onChange={e => {
+            setGeneratedPassword('')
+            register('password').onChange(e)
+          }}
           className={clsx(
             styles['change-password-form__input'],
             isEdit && styles['change-password-form__input--active']
