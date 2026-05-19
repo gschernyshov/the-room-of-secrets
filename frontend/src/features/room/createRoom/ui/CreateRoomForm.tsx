@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { useState, type SubmitEvent } from 'react'
 import { TextInput, Button } from '@gravity-ui/uikit'
 import { useCreateRoom } from '../model/useCreateRoom'
@@ -52,7 +53,11 @@ export const CreateRoomForm = ({ onPopupOpen }: Props) => {
           pin="circle-circle"
           disabled={isLoading || !nameRoom.trim()}
           loading={isLoading}
-          className={styles['create-room-form__button']}
+          className={clsx(
+            styles['create-room-form__button'],
+            (isLoading || !nameRoom.trim()) &&
+              styles['create-room-form__button--disabled']
+          )}
         >
           {isLoading ? 'Создание...' : 'Создать'}
         </Button>
