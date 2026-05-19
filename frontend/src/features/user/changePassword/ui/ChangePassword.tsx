@@ -21,6 +21,7 @@ export const ChangePassword = () => {
   const { successAlert, errorAlert } = useShowAlert()
   const {
     register,
+    watch,
     setValue,
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -39,6 +40,7 @@ export const ChangePassword = () => {
   const form = useRef<HTMLFormElement>(null)
   const [isEdit, setIsEdit] = useState(false)
   const [generatedPassword, setGeneratedPassword] = useState('')
+  const currentValue = watch('password')
 
   useEffect(() => {
     if (errors.root) {
@@ -123,11 +125,15 @@ export const ChangePassword = () => {
           type={isEdit ? 'text' : 'password'}
           placeholder={isEdit ? 'Введите пароль' : '••••••••••'}
           validationState={errors.password ? 'invalid' : undefined}
-          errorMessage={errors.password?.message}
+          errorMessage={
+            <p className={styles['change-password-form__error-message']}>
+              {errors.password?.message}
+            </p>
+          }
           {...register('password')}
           className={clsx(
             styles['change-password-form__input'],
-            !isEdit && styles['change-password-form__input--not-active']
+            isEdit && styles['change-password-form__input--active']
           )}
         />
 
@@ -164,12 +170,15 @@ export const ChangePassword = () => {
           type="button"
           size="xl"
           pin={isEdit ? 'circle-circle' : 'clear-circle'}
-          disabled={isSubmitting}
+          disabled={(isEdit && currentValue === '') || isSubmitting}
           loading={isSubmitting}
           onClick={handleClick}
           className={clsx(
             styles['change-password-form__button'],
-            !isEdit && styles['change-password-form__button--not-active']
+            isEdit && styles['change-password-form__button--active'],
+            isEdit &&
+              currentValue !== '' &&
+              styles['change-password-form__button--not-disabled']
           )}
         >
           {isEdit
