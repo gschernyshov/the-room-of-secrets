@@ -3,10 +3,7 @@
   flex-direction: column;
   gap: 15px;
   padding: 30px 20px;
-  background: #121212;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  border: 1px solid #2a2a2a;
-  border-radius: 23px;
   overflow: hidden;
 
   &__title {
@@ -22,7 +19,6 @@
 
   &__input {
     flex: 1;
-
     --g-text-input-background-color: rgba(30, 30, 30, 0.6);
     --g-text-input-border-color: #3a3a3a;
     --g-text-input-border-color-hover: #888;
