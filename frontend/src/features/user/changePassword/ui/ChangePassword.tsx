@@ -15,7 +15,6 @@ import { useShowAlert } from '@/widgets/globalAlert'
 import { useOnClickOutside } from '@/shared/lib/hooks/useOnClickOutside'
 import { createHandleFormErrors } from '@/shared/lib/form/createHandleFormErrors'
 import styles from './ChangePassword.module.scss'
-import { set } from 'zod/v3'
 
 export const ChangePassword = () => {
   const { handleChangePassword } = useChangePassword()
