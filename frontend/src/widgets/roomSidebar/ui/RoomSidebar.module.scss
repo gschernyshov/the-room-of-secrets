@@ -1,21 +1,79 @@
 .room-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 20px;
-  border: 1px solid rgb(222, 222, 222);
+  gap: 12px;
+  padding: 18px;
+  padding-top: 28px;
+  padding-right: calc(28px - 10px);
+  background: rgba(30, 30, 30, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid #2a2a2a;
   border-radius: 23px;
 
   &__title {
+    margin-left: 9px;
     font-size: 16px;
     font-weight: 500;
+    color: #bbb;
   }
 
   &__list {
-    list-style: none;
+    display: flex;
+    flex-direction: column;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #3a3a3a transparent;
+
+    &::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #3a3a3a;
+      border-radius: 2px;
+
+      &:hover {
+        background: #555;
+      }
+    }
   }
 
   &__item {
-    font-size: 14px;
+    padding: 5px 10px;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #ddd;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+  }
+
+  &__item--current {
+    color: #bbb;
+  }
+
+  &__item-status {
+    color: #ff5733;
+  }
+
+  &__item-status--active {
+    color: #007c00;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 2rem;
   }
 }
