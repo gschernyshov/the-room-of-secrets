@@ -9,7 +9,7 @@
   }
 
   &__sidebar {
-    margin-top: calc(10vh + 16px);
+    margin-top: calc((100vh - 20px - 20px - 16px - 16px) / 10 + 16px);
     width: 25%;
   }
 }
