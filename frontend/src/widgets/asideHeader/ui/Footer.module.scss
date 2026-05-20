@@ -15,15 +15,15 @@
 
   &__avatar {
     &--loading {
-      border: 2px solid orange;
+      border: 2px solid #ff7f00;
     }
 
     &--active {
-      border: 2px solid green;
+      border: 2px solid #007c00;
     }
 
     &--passive {
-      border: 2px solid red;
+      border: 2px solid #ff5733;
     }
   }
 
