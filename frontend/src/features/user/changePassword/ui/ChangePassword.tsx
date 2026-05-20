@@ -175,14 +175,14 @@ export const ChangePassword = () => {
           type="button"
           size="xl"
           pin={isEdit ? 'circle-circle' : 'clear-circle'}
-          disabled={(isEdit && currentValue === '') || isSubmitting}
+          disabled={(isEdit && !currentValue.trim()) || isSubmitting}
           loading={isSubmitting}
           onClick={handleClick}
           className={clsx(
             styles['change-password-form__button'],
             isEdit && styles['change-password-form__button--active'],
             isEdit &&
-              currentValue !== '' &&
+              currentValue.trim() &&
               styles['change-password-form__button--not-disabled']
           )}
         >
