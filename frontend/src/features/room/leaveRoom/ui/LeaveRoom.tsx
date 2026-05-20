@@ -3,6 +3,7 @@ import { useLeaveRoom } from '../model/useLeaveRoom'
 import { useShowAlert } from '@/widgets/globalAlert'
 import { type Room } from '@/entities/room/model/types'
 import { getErrorMessage } from '@/shared/utils/getErrorMessage'
+import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 
 type Props = {
   roomId: Room['id']
@@ -10,6 +11,7 @@ type Props = {
 
 export const LeaveRoom = ({ roomId }: Props) => {
   const { isLoading, leaveRoom } = useLeaveRoom()
+  const { pathname, goToProfile } = useAppNavigate()
   const { errorAlert } = useShowAlert()
 
   const handleLeaveRoom = async () => {
@@ -17,6 +19,10 @@ export const LeaveRoom = ({ roomId }: Props) => {
 
     try {
       await leaveRoom(roomId)
+
+      if (pathname.startsWith('/room/')) {
+        goToProfile('rooms')
+      }
     } catch (error) {
       errorAlert('Ошибка при выходе из комнаты', getErrorMessage(error))
     }
