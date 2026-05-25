@@ -25,7 +25,9 @@ export const useRoomListStore = create<RoomListState & RoomListActions>(
 
     addRoom: room =>
       set(state => ({
-        rooms: [...state.rooms.filter(r => r.id !== room.id), room],
+        rooms: state.rooms.some(r => r.id === room.id)
+          ? state.rooms
+          : [room, ...state.rooms],
       })),
 
     removeRoom: roomId =>
@@ -39,7 +41,14 @@ export const useRoomListStore = create<RoomListState & RoomListActions>(
         const result = await roomListApi()
 
         if (result.success) {
-          set({ rooms: result.data })
+          const rooms = result.data
+
+          rooms.sort(
+            (a: Room, b: Room) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+
+          set({ rooms })
         } else {
           throw new AppError(
             'При получении комнат возникла непредвиденная ошибка',
