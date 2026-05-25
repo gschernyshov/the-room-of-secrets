@@ -132,7 +132,7 @@ class RoomRepository {
   async getRoomsByUser(userId: User['id']): Promise<Room[] | null> {
     const rooms = await db.query<Room>(
       `
-        SELECT r.* 
+        SELECT r.id, r.name, r.participants, r.created_at AS "createdAt"
         FROM rooms r 
         JOIN users u 
         ON r.id = ANY(u.rooms) 

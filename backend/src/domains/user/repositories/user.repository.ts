@@ -11,7 +11,7 @@ class UserRepository {
     role,
     status,
     rooms,
-    created_at AS createdAt
+    created_at AS "createdAt"
   `
   async create(
     username: User['username'],
