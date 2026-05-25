@@ -8,7 +8,7 @@ export const userRoomsMenuItems = (
   onProfile: (tab?: string) => void,
   onRoom: (id: Room['id']) => void
 ): AsideHeaderItem[] => {
-  if (compact) {
+  if (compact && rooms.length !== 0) {
     return [
       {
         id: 'user-rooms',
