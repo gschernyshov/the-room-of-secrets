@@ -1,13 +1,18 @@
-import { useState } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { exitRoom } from './exitRoom'
 import { type Room } from '@/entities/room/model/types'
 import { AppError } from '@/shared/utils/errors'
 
 export const useExitRoom = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const isLoadingRef = useRef(false)
 
-  const exit = async (id: Room['id']) => {
-    if (isLoading) return
+  useEffect(() => {
+    isLoadingRef.current = isLoading
+  }, [isLoading])
+
+  const exit = useCallback(async (id: Room['id']) => {
+    if (isLoadingRef.current) return
 
     setIsLoading(true)
     try {
@@ -19,7 +24,7 @@ export const useExitRoom = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   return {
     isLoading,

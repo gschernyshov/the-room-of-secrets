@@ -50,8 +50,7 @@ export const Field = ({ nameField }: Props) => {
         errors.root.message
       )
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors.root])
+  }, [errors.root, nameField, errorAlert])
 
   useOnClickOutside(form, () => {
     if (!isEdit || isSubmitting) return

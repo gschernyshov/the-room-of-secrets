@@ -1,20 +1,33 @@
+import { useCallback } from 'react'
 import { useAlertStore, type AlertType } from './alertStore'
 
 export const useShowAlert = () => {
   const { showAlert, closeAlert } = useAlertStore()
 
-  const show = (type: AlertType, title: string, message: string) => {
-    showAlert({ type, title, message })
-  }
+  const show = useCallback(
+    (type: AlertType, title: string, message: string) => {
+      showAlert({ type, title, message })
+    },
+    [showAlert]
+  )
 
-  const infoAlert = (title: string, message: string) =>
-    show('info', title, message)
-  const successAlert = (title: string, message: string) =>
-    show('success', title, message)
-  const warningAlert = (title: string, message: string) =>
-    show('warning', title, message)
-  const errorAlert = (title: string, message: string = 'Ошибка') =>
-    show('danger', title, message)
+  const infoAlert = useCallback(
+    (title: string, message: string) => show('info', title, message),
+    [show]
+  )
+  const successAlert = useCallback(
+    (title: string, message: string) => show('success', title, message),
+    [show]
+  )
+  const warningAlert = useCallback(
+    (title: string, message: string) => show('warning', title, message),
+    [show]
+  )
+  const errorAlert = useCallback(
+    (title: string, message: string = 'Ошибка') =>
+      show('danger', title, message),
+    [show]
+  )
 
   return {
     infoAlert,

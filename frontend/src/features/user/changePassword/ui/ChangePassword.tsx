@@ -46,8 +46,7 @@ export const ChangePassword = () => {
     if (errors.root) {
       errorAlert('Обновление пароля пользователя', errors.root.message)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors.root])
+  }, [errors.root, errorAlert])
 
   useOnClickOutside(form, () => {
     if (!isEdit || isSubmitting) return

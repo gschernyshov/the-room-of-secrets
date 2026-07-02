@@ -21,23 +21,20 @@ export const AuthProvider = ({ children }: Props) => {
   }, [status])
 
   useEffect(() => {
-    if (status === 'authenticated' && user) {
+    if (status === 'authenticated' && user?.id) {
       useRoomListStore.getState().loadUserRooms(user.id)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, user?.id])
 
   useEffect(() => {
     if (errorSessionStore)
       errorAlert('Ошибка аутентификации', errorSessionStore)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorSessionStore])
+  }, [errorSessionStore, errorAlert])
 
   useEffect(() => {
     if (errorRoomListStore)
       errorAlert('Ошибка загрузки комнат', errorRoomListStore)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorRoomListStore])
+  }, [errorRoomListStore, errorAlert])
 
   useEffect(() => {
     initTokenRefreshListener()

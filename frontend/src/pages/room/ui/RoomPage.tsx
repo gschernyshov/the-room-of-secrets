@@ -38,16 +38,14 @@ export const RoomPage = () => {
     return () => {
       if (isConnected) exit(roomId)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, isConnected])
+  }, [roomId, isConnected, join, exit])
 
   useEffect(() => {
     if (error) {
       errorAlert(`Ошибка при подключении к комнате`, error)
       goToProfile()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error])
+  }, [error, errorAlert, goToProfile])
 
   if (isConnecting || isLoading) {
     return <Loader size="m" />
