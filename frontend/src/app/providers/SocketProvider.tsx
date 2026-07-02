@@ -26,12 +26,11 @@ export const SocketProvider = ({ children }: Props) => {
     socketService
       .connect(accessToken)
       .then(() => {
+        // Для случая, когда меняется токен и происходит рендер
         setConnected()
       })
       .catch(() => {})
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken])
+  }, [accessToken, setConnecting, setConnected, setDisconnected])
 
   useEffect(() => {
     const handleConnect = () => {
@@ -57,10 +56,10 @@ export const SocketProvider = ({ children }: Props) => {
         try {
           await socketService.connectWithFreshToken()
         } catch (error) {
-          errorAlert('Ошибка подключения к серверу: ', getErrorMessage(error))
+          errorAlert('Ошибка подключения к серверу', getErrorMessage(error))
         }
       } else {
-        errorAlert('Ошибка подключения к серверу: ', error.message)
+        errorAlert('Ошибка подключения к серверу', getErrorMessage(error))
       }
     }
 
@@ -73,8 +72,14 @@ export const SocketProvider = ({ children }: Props) => {
       socketService.off('connect_error', handleConnectError)
       socketService.off('disconnect', handleDisconnect)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken])
+  }, [
+    accessToken,
+    setConnecting,
+    setConnected,
+    setDisconnected,
+    successAlert,
+    errorAlert,
+  ])
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -83,6 +88,7 @@ export const SocketProvider = ({ children }: Props) => {
         socketService
           .connect(accessToken)
           .then(() => {
+            // Для случая, когда подключение не было разорввано
             setConnected()
           })
           .catch(() => {})
@@ -93,8 +99,7 @@ export const SocketProvider = ({ children }: Props) => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken])
+  }, [accessToken, errorAlert, setConnecting, setConnected, setDisconnected])
 
   return <>{children}</>
 }
