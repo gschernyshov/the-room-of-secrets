@@ -1,14 +1,12 @@
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
 import { routeConfig } from '../routes'
+import { useAppNavigate } from '@/shared/lib/router/useAppNavigate'
 
 export const RouteTitleSetter = () => {
-  const location = useLocation()
+  const { pathname } = useAppNavigate()
 
   useEffect(() => {
-    const currentRoute = Object.values(routeConfig).find(
-      route => route.path === location.pathname
-    )
+    const currentRoute = routeConfig.find(route => route.path === pathname)
 
     if (currentRoute?.title) {
       const originalTitle = document.title
@@ -18,7 +16,7 @@ export const RouteTitleSetter = () => {
         document.title = originalTitle
       }
     }
-  }, [location.pathname])
+  }, [pathname])
 
   return null
 }
