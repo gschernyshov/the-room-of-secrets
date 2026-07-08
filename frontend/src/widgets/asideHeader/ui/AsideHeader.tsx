@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react'
-import { useLocation } from 'react-router-dom'
 import { AsideHeader as GravityAsideHeader } from '@gravity-ui/navigation'
 import { CardClub } from '@gravity-ui/icons'
 import { Footer } from './Footer'
@@ -13,10 +12,15 @@ import styles from './AsideHeader.module.scss'
 
 export const AsideHeader = () => {
   const { asideRef, compact, onCompact, handleClose } = useAsideState()
-  const { goToLogin, goToRegister, goToHome, goToProfile, goToRoom, pathname } =
-    useAppNavigate()
-  const location = useLocation()
-  const state = location.state
+  const {
+    state,
+    pathname,
+    goToLogin,
+    goToRegister,
+    goToHome,
+    goToProfile,
+    goToRoom,
+  } = useAppNavigate()
 
   const handleLogin = useCallback(() => {
     goToLogin({ state: { from: state?.from } })

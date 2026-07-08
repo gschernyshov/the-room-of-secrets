@@ -9,7 +9,7 @@ import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
 export const useAppNavigate = () => {
   const navigate = useNavigate()
-  const { pathname, search } = useLocation()
+  const { state, pathname, search } = useLocation()
   const [searchParams] = useSearchParams()
 
   const goToHome = useCallback(
@@ -59,6 +59,7 @@ export const useAppNavigate = () => {
   }, [navigate])
 
   return {
+    state,
     pathname,
     search,
     searchParams,

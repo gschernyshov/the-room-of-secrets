@@ -1,4 +1,3 @@
-import { useLocation } from 'react-router-dom'
 import { type RegisterData } from './schema'
 import { registerApi } from '../api/register'
 import { useSessionStore } from '@/entities/session/model/sessionStore'
@@ -8,9 +7,7 @@ import { AppError } from '@/shared/utils/errors'
 import { AppRoutes, RoutePath } from '@/shared/consts/router'
 
 export const useRegister = () => {
-  const { navigate } = useAppNavigate()
-  const location = useLocation()
-  const state = location.state
+  const { state, navigate } = useAppNavigate()
 
   const handleRegister = async (data: RegisterData) => {
     try {
