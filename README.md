@@ -71,7 +71,7 @@ cp frontend/.env.example frontend/.env
 
 ```env
 NODE_ENV=development
-PORT=8000
+
 BACKEND_PORT=8000
 
 DB_HOST=postgres
@@ -92,6 +92,7 @@ CORS_ORIGINS=http://localhost:8003
 
 LOKI_PORT=3100
 PROMETHEUS_PORT=9090
+
 GRAFANA_PORT=3000
 GRAFANA_USER=admin
 GRAFANA_PASSWORD=admin
@@ -104,8 +105,6 @@ FRONTEND_PORT=8003
 VITE_API_URL=http://localhost:8000/api
 VITE_SOCKET_URL=http://localhost:8000
 ```
-
-Важно: backend-сервер в коде слушает `PORT` или `8000` по умолчанию, а Docker Compose пробрасывает `${BACKEND_PORT}`. Если меняете порт backend, держите `PORT` и `BACKEND_PORT` согласованными.
 
 ### 2. Запустить dev-окружение
 
