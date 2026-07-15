@@ -1,203 +1,341 @@
-# The Room of Secrets — Docker Guide
+# The Room of Secrets
 
-## Основные команды Docker Compose
+**The Room of Secrets** — pet-проект полнофункционального real-time чата с комнатами, авторизацией, профилем пользователя, хранением истории сообщений и базовой observability-инфраструктурой. Проект разделён на frontend и backend, запускается через Docker Compose и демонстрирует типичный production-oriented стек для небольшого web-приложения.
 
-| Команда      | Что делает                                             |
-| ------------ | ------------------------------------------------------ |
-| `build`      | Только собирает образы                                 |
-| `create`     | Только создаёт контейнеры (без запуска)                |
-| `start`      | Запускает контейнеры, которые уже были созданы ранее   |
-| `run`        | Запускает одноразовый контейнер для команды            |
-| `up`         | Создаёт + запускает (с авто-сборкой при необходимости) |
-| `up --build` | Создаёт + запускает, но точно пересобирает образы      |
+## Возможности
 
-### Подробности по командам
+- Регистрация, вход, выход и обновление пользовательской сессии.
+- Access token для API и Socket.IO, refresh token в httpOnly cookie.
+- Защищённые страницы и API-роуты для авторизованных пользователей.
+- Создание комнат, вход в комнату, выход из комнаты и список комнат пользователя.
+- Real-time обмен сообщениями через Socket.IO.
+- Онлайн-присутствие участников комнаты: события входа и выхода пользователя.
+- Профиль пользователя с изменением username, email и пароля.
+- Хранение пользователей, комнат и сообщений в PostgreSQL.
+- Redis для refresh token, буфера сообщений и быстрого получения свежих сообщений.
+- Фоновый воркер, который периодически сбрасывает сообщения из Redis в PostgreSQL.
+- Метрики Prometheus и логи через Loki/Promtail/Grafana в production-compose.
 
-#### `docker compose -f compose.dev.yml build`
+## Технологический стек
 
-Собирает (или пересобирает) образы для всех сервисов с `build:`, но не запускает контейнеры. Полезно для обновления образов без запуска.
+| Зона           | Технологии                                                                                          |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| Frontend       | React 19, TypeScript, Vite, React Router, Zustand, React Hook Form, Zod, Sass, Gravity UI, Three.js |
+| Backend        | Node.js 24, TypeScript, Express 5, Socket.IO, PostgreSQL, Redis, JWT, bcrypt                        |
+| Инфраструктура | Docker, Docker Compose, Nginx, Prometheus, Loki, Promtail, Grafana                                  |
+| Хранилища      | PostgreSQL для основных данных, Redis для сессий и временного буфера сообщений                      |
 
-#### `docker compose -f compose.dev.yml create`
+## Архитектура
 
-Создаёт контейнеры (с настройками, томами, сетями), но не запускает их. Можно потом включить через `start`.
+```text
+frontend
+  src/app       — провайдеры, роутинг, layout приложения
+  src/pages     — страницы приложения
+  src/widgets   — крупные UI-блоки: sidebar, chat, profile card, alerts
+  src/features  — пользовательские сценарии: login, register, create room, send message
+  src/entities  — модели и API сущностей: session, user, room, message
+  src/shared    — общие API-клиенты, утилиты, типы, UI-компоненты
 
-#### `docker compose -f compose.dev.yml start`
-
-Запускает уже созданные, но остановленные контейнеры. Не создаёт и не пересобирает — просто «включает».
-
-#### `docker compose -f compose.dev.yml run backend printenv`
-
-Запускает одноразовый новый контейнер для сервиса `backend` и выполняет в нём `printenv`.
-
-> `run` запускает **новый одноразовый контейнер** на основе сервиса `backend`.  
-> Это **не тот же контейнер**, что запущен через `up`.  
-> Отличается от `exec`, который заходит **в уже работающий** контейнер.
-
-#### `docker compose -f compose.dev.yml up`
-
-Запускает контейнеры, используя уже собранные образы. Если образа сервиса ещё нет, то он будет автоматически собран. Однако, если образ уже существует, он будет использован повторно, даже если исходный код был изменён после последней сборки.
-
-#### `docker compose -f compose.dev.yml up --build`
-
-Пересобирает и запускает все сервисы из `compose.dev.yml`, но работает корректно только если переменные окружения доступны либо через `.env` в корне, либо через `export` в терминале.
-
-## Полный запуск с указанием .env-файлов
-
-```bash
-docker compose --env-file ./frontend/.env --env-file ./backend/.env -f compose.prod.yml up --build
+backend
+  src/routes          — HTTP-маршруты Express
+  src/domains         — бизнес-логика, repositories, validations, events
+  src/infrastructure  — БД, Redis, Socket.IO, auth middleware, metrics, background workers
+  src/shared          — logger, ошибки, общие утилиты
 ```
 
-- Запускает и пересобирает все сервисы из `compose.dev.yml`.
-- `--env-file` указывает, откуда брать значения для переменных вроде `${BACKEND_PORT}`.
-- `-f` явно задаёт файл конфигурации.
-- `--build` гарантирует пересборку образов с учётом последних изменений.
+Backend построен вокруг доменных модулей: authentication, user, room и message. HTTP-слой отвечает за REST-сценарии, Socket.IO — за real-time взаимодействие внутри комнат. События домена проходят через внутренний event bus, что отделяет бизнес-действия от побочных эффектов.
 
-## Остановка и удаление сервисов
+## Как работает обмен сообщениями
 
-```bash
-docker compose --env-file ./frontend/.env --env-file ./backend/.env -f compose.dev.yml down
-```
+1. Пользователь подключается к Socket.IO с access token.
+2. Клиент отправляет `join_room`, сервер проверяет комнату и добавляет socket в Socket.IO-room.
+3. При `send_message` сервер валидирует payload и проверяет, что socket действительно состоит в комнате.
+4. Сообщение кладётся в Redis:
+   - в общий batch-буфер для последующего сохранения;
+   - в room-буфер для быстрого получения свежих сообщений.
+5. Сервер рассылает `new_message` всем участникам комнаты.
+6. Background worker каждые несколько секунд пачками сохраняет сообщения из Redis в PostgreSQL.
 
-- Останавливает и удаляет: контейнеры (например, `room_backend`, `room_postgres`) и сети (например, `app-network`).
+## Быстрый старт через Docker
 
-```bash
-docker compose --env-file ./frontend/.env --env-file ./backend/.env -f compose.prod.yml down --volumes
-```
+### 1. Подготовить env-файлы
 
-- Полностью останавливает и удаляет все сервисы и их данные (включая базу данных), оставляя только Docker-образы.
-- Используется, чтобы сбросить всё до чистого состояния.
-
-## Просмотр переменных окружения
-
-### В контейнерах, запущенных через Docker Compose
+Скопируйте примеры переменных окружения:
 
 ```bash
-docker compose -f compose.dev.yml exec backend printenv
-docker compose -f compose.dev.yml exec frontend printenv
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
-- Показывает переменные окружения в контейнере сервиса `frontend` / `backend`, запущенного через Docker Compose.
+Минимальный пример `backend/.env` для локального запуска:
 
-### В уже запущенных контейнерах (напрямую через Docker)
+```env
+NODE_ENV=development
+PORT=8000
+BACKEND_PORT=8000
+
+DB_HOST=postgres
+DB_PORT=8001
+DB_USER=admin
+DB_PASSWORD=admin
+DB_NAME=the_room_of_secrets
+
+REDIS_PORT=8002
+REDIS_URL=redis://redis:8002
+
+JWT_ACCESS_TOKEN_SECRET=change_me_access_secret
+JWT_ACCESS_TOKEN_EXPIRES_IN=15m
+JWT_REFRESH_TOKEN_SECRET=change_me_refresh_secret
+JWT_REFRESH_TOKEN_EXPIRES_IN=7d
+
+CORS_ORIGINS=http://localhost:8003
+
+LOKI_PORT=3100
+PROMETHEUS_PORT=9090
+GRAFANA_PORT=3000
+GRAFANA_USER=admin
+GRAFANA_PASSWORD=admin
+```
+
+Минимальный пример `frontend/.env`:
+
+```env
+FRONTEND_PORT=8003
+VITE_API_URL=http://localhost:8000/api
+VITE_SOCKET_URL=http://localhost:8000
+```
+
+Важно: backend-сервер в коде слушает `PORT` или `8000` по умолчанию, а Docker Compose пробрасывает `${BACKEND_PORT}`. Если меняете порт backend, держите `PORT` и `BACKEND_PORT` согласованными.
+
+### 2. Запустить dev-окружение
 
 ```bash
-docker exec room_backend printenv
-docker exec room_frontend printenv
+docker compose --env-file ./backend/.env --env-file ./frontend/.env -f compose.dev.yml up --build
 ```
 
-- Показывает переменные окружения в контейнере с именем `room_backend` / `room_frontend`, запущенном напрямую через Docker.
+После запуска:
 
-> 💡 Разница: `docker compose exec` зависит от конфигурации и переменных на момент запуска команды, а `docker exec` — от уже запущенного контейнера, которому всё равно, как он был создан.
+- frontend: `http://localhost:8003`
+- backend API: `http://localhost:8000/api`
+- Socket.IO: `http://localhost:8000`
+- PostgreSQL: `localhost:8001`
+- Redis: `localhost:8002`
 
-### Что делает `printenv`?
-
-`printenv` — стандартная утилита в Linux / Unix-системах, которая выводит список всех переменных окружения, доступных в текущей оболочке.
-
-### Примеры использования
+### 3. Остановить окружение
 
 ```bash
-# Вход в работающий контейнер
-docker compose exec backend printenv
-
-# Запуск временного контейнера
-docker compose run backend printenv
+docker compose --env-file ./backend/.env --env-file ./frontend/.env -f compose.dev.yml down
 ```
 
-> `exec` — как «войти в работающий контейнер и выполнить команду». Не создаёт ничего нового — просто взаимодействует с тем, что уже запущено. Часто используется для отладки и проверки настроек.
-
-## Просмотр файловой системы контейнера
-
-#### 1. Посмотрите имя или ID контейнера
+Удалить контейнеры вместе с volume-данными:
 
 ```bash
-docker ps
+docker compose --env-file ./backend/.env --env-file ./frontend/.env -f compose.dev.yml down --volumes
 ```
 
-#### 2. Подключитесь к контейнеру
+## Production-like запуск
+
+Production-compose собирает backend в `dist`, отдаёт frontend через Nginx и дополнительно поднимает observability-стек.
 
 ```bash
-docker exec -it a1b2c3d4e5f6 sh
+docker compose --env-file ./backend/.env --env-file ./frontend/.env -f compose.prod.yml up --build
 ```
 
-> Замените `a1b2c3d4e5f6` на реальный ID или имя контейнера.
+Сервисы:
 
-#### 3. Выполните команды внутри контейнера
+| Сервис       | Назначение                                         |
+| ------------ | -------------------------------------------------- |
+| `backend`    | HTTP API, Socket.IO, миграции, background worker   |
+| `frontend`   | Nginx со статической сборкой React-приложения      |
+| `postgres`   | Основная реляционная база                          |
+| `redis`      | Сессии и буфер сообщений                           |
+| `prometheus` | Сбор метрик backend, Prometheus и Loki             |
+| `loki`       | Хранилище логов                                    |
+| `promtail`   | Доставка логов контейнеров и backend-файлов в Loki |
+| `grafana`    | Дашборды и просмотр метрик/логов                   |
+
+По умолчанию Grafana доступна на порту из `GRAFANA_PORT`, Prometheus — на `PROMETHEUS_PORT`, Loki — на `LOKI_PORT`.
+
+## Локальный запуск без Docker
+
+Для полноценного локального запуска без Docker нужны PostgreSQL и Redis с параметрами из `backend/.env`.
+
+Backend:
 
 ```bash
-node -v             # версия Node.js
-ps aux              # какие процессы работают
-printenv            # переменные окружения
-pwd                 # где вы находитесь
-ls -la              # посмотреть файлы
-cat .env            # посмотреть содержимое .env
+cd backend
+npm ci
+npm run build
+npm run copy:migrations
+npm run start
 ```
 
-## Подключение к Redis
-
-### Подключение к Redis CLI
+Dev-режим backend:
 
 ```bash
-docker exec -it room_redis redis-cli -p 8002
+cd backend
+npm ci
+npm run dev
 ```
 
-> Подключается к контейнеру `room_redis` и запускает `redis-cli` — интерактивную оболочку Redis на порту `8002`.
-
-### Основные команды Redis
+Frontend:
 
 ```bash
-KEYS *            # Просмотр всех ключей
-GET <key>         # Получить значение по ключу
-SET <key> <value> # Установить значение
-DEL <key>         # Удалить ключ
-FLUSHDB           # Очистить текущую базу данных
+cd frontend
+npm ci
+npm run dev
 ```
 
-### Выход из Redis CLI
+## API
 
-```bash
-exit
+Базовый URL frontend-клиента задаётся через `VITE_API_URL`, обычно `http://localhost:8000/api`.
+
+Ответы backend приведены к общему формату:
+
+```json
+{ "success": true, "data": {} }
 ```
 
-> Завершает сессию `redis-cli` и возвращается в командную строку контейнера.
+или:
 
-## Работа с PostgreSQL в контейнере
+```json
+{ "success": false, "error": { "message": "Описание ошибки" } }
+```
 
-### Подключение к PostgreSQL
+### Auth
+
+| Метод  | URL              | Тело запроса                    | Назначение                                   |
+| ------ | ---------------- | ------------------------------- | -------------------------------------------- |
+| `POST` | `/auth/register` | `{ username, email, password }` | Регистрация пользователя                     |
+| `POST` | `/auth/login`    | `{ email, password }`           | Вход пользователя                            |
+| `POST` | `/auth/logout`   | refresh cookie                  | Выход и отзыв refresh token                  |
+| `POST` | `/auth/refresh`  | refresh cookie                  | Обновление access token через refresh cookie |
+
+### User
+
+| Метод  | URL                     | Тело запроса   | Назначение           |
+| ------ | ----------------------- | -------------- | -------------------- |
+| `GET`  | `/user/me`              | -              | Текущий пользователь |
+| `POST` | `/user/update/username` | `{ username }` | Изменение username   |
+| `POST` | `/user/update/email`    | `{ email }`    | Изменение email      |
+| `POST` | `/user/update/password` | `{ password }` | Изменение пароля     |
+
+### Room
+
+| Метод    | URL            | Тело запроса | Назначение                    |
+| -------- | -------------- | ------------ | ----------------------------- |
+| `POST`   | `/room/create` | `{ name }`   | Создание комнаты              |
+| `DELETE` | `/room/leave`  | `{ id }`     | Выход из комнаты              |
+| `GET`    | `/room/user`   | -            | Комнаты текущего пользователя |
+
+Защищённые запросы требуют заголовок:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+## Socket.IO события
+
+Клиент подключается к `VITE_SOCKET_URL` и передаёт access token в `auth.token`.
+
+```ts
+io(SOCKET_URL, {
+  auth: { token: accessToken },
+  withCredentials: true,
+})
+```
+
+### Client -> Server
+
+| Событие        | Payload               | Что делает                                                             |
+| -------------- | --------------------- | ---------------------------------------------------------------------- |
+| `join_room`    | `{ roomId }`          | Вход в комнату, получение комнаты, истории сообщений и online user ids |
+| `exit_room`    | `{ roomId }`          | Выход socket из комнаты                                                |
+| `send_message` | `{ roomId, content }` | Отправка сообщения в комнату                                           |
+
+### Server -> Client
+
+| Событие       | Payload                 | Когда приходит                                 |
+| ------------- | ----------------------- | ---------------------------------------------- |
+| `new_message` | `Message`               | После успешной отправки сообщения              |
+| `user_joined` | `{ userId, timestamp }` | Когда другой пользователь вошёл в комнату      |
+| `user_left`   | `{ userId, timestamp }` | Когда другой пользователь вышел или отключился |
+
+## База данных
+
+Миграции лежат в `backend/src/infrastructure/database/migrations` и выполняются автоматически при старте backend.
+
+Основные таблицы:
+
+| Таблица    | Назначение                                                      |
+| ---------- | --------------------------------------------------------------- |
+| `users`    | Пользователи, роль, статус, список комнат                       |
+| `rooms`    | Комнаты и JSONB-список участников со статусами                  |
+| `messages` | История сообщений с индексами по комнате, отправителю и времени |
+
+Подключение к PostgreSQL в Docker:
 
 ```bash
 docker exec -it room_postgres psql -U admin -d the_room_of_secrets -p 8001
 ```
 
-> Подключается к контейнеру `room_postgres` и запускает `psql` — интерактивную оболочку PostgreSQL с пользователем `admin`, базой данных `the_room_of_secrets` и портом `8001`.
+Подключение к Redis:
 
-### Просмотр таблиц в базе данных
-
-```sql
-\dt
+```bash
+docker exec -it room_redis redis-cli -p 8002
 ```
 
-> Показывает все таблицы в текущей схеме.
+## Наблюдаемость
 
-```sql
-\dt *
+Backend регистрирует Prometheus-метрику `http_requests_total` с labels `method`, `route` и `status_code`. Prometheus забирает метрики с backend по `/metrics`.
+
+Production-compose также поднимает:
+
+- Loki для хранения логов.
+- Promtail для сбора логов Docker-контейнеров с label `app.room=true` и файлов из `backend/logs`.
+- Grafana с заранее подключёнными datasource для Prometheus и Loki.
+
+## Полезные команды
+
+Проверить логи backend:
+
+```bash
+docker logs -f room_backend
 ```
 
-> Показывает все таблицы во всех схемах.
+Посмотреть запущенные контейнеры:
 
-### Выполнение SQL-запросов
-
-```sql
-SELECT * FROM users;
-SELECT * FROM rooms;
-SELECT * FROM messsages;
+```bash
+docker ps
 ```
 
-> Выполняет выборку данных из таблиц `users`, `rooms` и `messsages`.
+Зайти внутрь backend-контейнера:
 
-### Выход из PostgreSQL
-
-```sql
-\q
+```bash
+docker exec -it room_backend sh
 ```
 
-> Завершает сессию `psql` и возвращается в командную строку контейнера.
+Собрать frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+Собрать backend:
+
+```bash
+cd backend
+npm run build
+```
+
+Проверить frontend линтером:
+
+```bash
+cd frontend
+npm run lint
+```
+
+## Документация
+
+Дополнительная Docker-памятка сохранена в [docs/docker-guide.md](docs/docker-guide.md).
